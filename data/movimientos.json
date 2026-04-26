@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "4693ad2f-5ab6-49bd-8ca7-79aa0c1f43c0",
+      "fecha": "2026-04-26T18:42:36.611Z",
+      "usuario": "admin",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "detalle": "Consumo directo: 3 ud. cerradas (4→1) | ok3"
+    },
+    {
       "id": "b7ad0a06-edea-4a63-842d-6dcb015353ae",
       "fecha": "2026-04-26T18:39:41.235Z",
       "usuario": "admin",
