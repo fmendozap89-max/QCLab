@@ -11,6 +11,18 @@
       "fecha_prep": "2026-04-26",
       "vencimiento": "2026-07-25",
       "titulos": []
+    },
+    {
+      "id": "f794d158-64f3-4729-91f0-89f82081ce2b",
+      "estado": "en_uso",
+      "maestro_id": "7a32231c",
+      "fecha_ingreso": "2026-04-26",
+      "ingresado_por": "admin",
+      "comentarios": [],
+      "codigo": "SVH-C15",
+      "fecha_prep": "2026-04-26",
+      "vencimiento": "2027-04-26",
+      "titulos": []
     }
   ]
 }
