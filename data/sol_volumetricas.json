@@ -14,7 +14,7 @@
     },
     {
       "id": "f794d158-64f3-4729-91f0-89f82081ce2b",
-      "estado": "en_uso",
+      "estado": "agotada",
       "maestro_id": "7a32231c",
       "fecha_ingreso": "2026-04-26",
       "ingresado_por": "admin",
@@ -40,6 +40,18 @@
           "analista": "admin"
         }
       ]
+    },
+    {
+      "id": "f86fc3b6-0226-4162-8927-17d61ee6a04d",
+      "estado": "en_uso",
+      "maestro_id": "7a32231c",
+      "fecha_ingreso": "2026-04-26",
+      "ingresado_por": "admin",
+      "comentarios": [],
+      "codigo": "SVH-C16",
+      "fecha_prep": "2026-04-27",
+      "vencimiento": "2027-04-27",
+      "titulos": []
     }
   ]
 }
