@@ -41,8 +41,15 @@
       "hash": "-eqjx0q",
       "display": "VB",
       "role": "gestor"
+    },
+    {
+      "id": "dc78d23b-7c4e-48cc-98e8-e70948f533b3",
+      "username": "VR",
+      "hash": "1uyt01",
+      "display": "VR",
+      "role": "usuario"
     }
   ],
-  "ts_mod": "2026-04-26T20:48:36.703Z",
+  "ts_mod": "2026-04-26T20:48:54.590Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
