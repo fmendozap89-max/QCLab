@@ -1,0 +1,16 @@
+{
+  "registros": [
+    {
+      "id": "7df8fd5b-0b40-4d65-b548-16e83b6d6bb5",
+      "estado": "en_uso",
+      "maestro_id": "7a32231c",
+      "fecha_ingreso": "2026-04-26",
+      "ingresado_por": "admin",
+      "comentarios": [],
+      "codigo": "SVH-C12",
+      "fecha_prep": "2026-04-26",
+      "vencimiento": "2026-07-25",
+      "titulos": []
+    }
+  ]
+}
