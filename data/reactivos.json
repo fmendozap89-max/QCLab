@@ -1,0 +1,18 @@
+{
+  "registros": [
+    {
+      "id": "85c250d0-d175-462c-9039-23c4c412b5df",
+      "estado": "activo",
+      "maestro_id": "48195d5d",
+      "fecha_ingreso": "2026-04-26",
+      "ingresado_por": "admin",
+      "comentarios": [],
+      "codigo_rc": "RC26001",
+      "lote": "ABC123",
+      "cantidad_total": 4,
+      "cantidad_en_uso": 0,
+      "cantidad_cerradas": 0,
+      "vencimiento": "2026-07-20"
+    }
+  ]
+}
