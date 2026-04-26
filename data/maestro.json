@@ -541,7 +541,8 @@
       "aviso_val": 3,
       "aviso_uni": "dias",
       "aviso_meses": 0.09868421052631579,
-      "observaciones": null
+      "observaciones": null,
+      "codigo_base": "SVH"
     },
     {
       "id": "ca858ea4",
