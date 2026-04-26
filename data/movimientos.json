@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "1bbbb013-611b-46bc-a731-db59a7daf6fa",
+      "fecha": "2026-04-26T17:03:35.434Z",
+      "usuario": "admin",
+      "tipo": "baja",
+      "modulo": "reactivos",
+      "ref_id": "85c250d0-d175-462c-9039-23c4c412b5df",
+      "detalle": "Baja directa por gestor. Motivo: error"
+    },
+    {
       "id": "24af7229-d179-411e-9b36-ef6a1a0ccd59",
       "fecha": "2026-04-26T16:36:28.398Z",
       "usuario": "admin",
