@@ -1,28 +1,3 @@
 {
-  "pendientes": [
-    {
-      "id": "d45b7c43-6780-4e9b-a867-1aa40de5ce48",
-      "tipo": "bajo_stock",
-      "modulo": "reactivos",
-      "ref_id": "e6eb0ec1-ffce-4e0f-8c91-5eef9014fcdf",
-      "comentario": "Bajo stock: Ácido sulfúrico 98% ACS — cerradas: 2/2 x 4L",
-      "solicitado_por": "admin",
-      "fecha": "2026-04-26T17:11:22.498Z",
-      "estado": "aprobada",
-      "resuelto_por": "admin",
-      "fecha_resolucion": "2026-04-26T17:11:36.516Z"
-    },
-    {
-      "id": "551860d3-9f29-46a6-b064-d0cfa1652224",
-      "tipo": "bajo_stock",
-      "modulo": "estandares",
-      "ref_id": "3f861d4d-35c9-4865-9552-75b0a940d508",
-      "comentario": "Bajo stock: CafeÃÂÃÂ­na USP RS — cerradas: 2/2 Vial x 500mg",
-      "solicitado_por": "admin",
-      "fecha": "2026-04-26T17:09:55.150Z",
-      "estado": "aprobada",
-      "resuelto_por": "admin",
-      "fecha_resolucion": "2026-04-26T17:10:20.351Z"
-    }
-  ]
+  "pendientes": []
 }
