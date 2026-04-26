@@ -80,8 +80,15 @@
       "modulo": "columnas",
       "ref_id": "72e2fc2b-785e-420c-844a-f741efaebf71",
       "detalle": "Ingreso: Kinetex C18 150×4.6 2"
+    },
+    {
+      "id": "5265bff3-b293-4c2d-af92-3700cb3ba6e3",
+      "fecha": "2026-04-26T20:08:19.890Z",
+      "usuario": "FM",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "detalle": "Apertura: cerradas 1→0, en uso 0→1 (aprobado por FM)"
     }
-  ],
-  "ts_mod": "2026-04-26T20:06:00.870Z",
-  "device_mod": "dev_mog660xx_bgjlw"
+  ]
 }
