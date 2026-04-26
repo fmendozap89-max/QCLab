@@ -1,58 +1,22 @@
 {
   "log": [
     {
-      "id": "4cf9882e-043a-4a68-8e44-bf5bd5256858",
-      "fecha": "2026-04-26T18:43:10.682Z",
+      "id": "71ddce3d-e127-44d0-8637-4849a64721ba",
+      "fecha": "2026-04-26T19:32:15.309Z",
       "usuario": "admin",
       "tipo": "ingreso",
-      "modulo": "estandares",
-      "ref_id": "89287c57-7227-4992-aacb-73ede7d7f669",
-      "detalle": "Ingreso: Cafeína USP RS "
+      "modulo": "columnas",
+      "ref_id": "72e2fc2b-785e-420c-844a-f741efaebf71",
+      "detalle": "Ingreso: Kinetex C18 150×4.6 2"
     },
     {
-      "id": "4693ad2f-5ab6-49bd-8ca7-79aa0c1f43c0",
-      "fecha": "2026-04-26T18:42:36.611Z",
-      "usuario": "admin",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
-      "detalle": "Consumo directo: 3 ud. cerradas (4→1) | ok3"
-    },
-    {
-      "id": "b7ad0a06-edea-4a63-842d-6dcb015353ae",
-      "fecha": "2026-04-26T18:39:41.235Z",
-      "usuario": "admin",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
-      "detalle": "Consumo directo: 3 ud. cerradas (4→1) | ok"
-    },
-    {
-      "id": "a39e3dae-6e21-441c-b9e4-4fd623888951",
-      "fecha": "2026-04-26T18:39:19.794Z",
-      "usuario": "admin",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
-      "detalle": "Consumo directo: 1 ud. cerradas (5→4) | 4"
-    },
-    {
-      "id": "7b928f8c-ef4a-4c83-97e9-4c9d5b80cdc4",
-      "fecha": "2026-04-26T18:38:54.658Z",
-      "usuario": "admin",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
-      "detalle": "Consumo directo: 1 ud. cerradas (6→5) | ok1"
-    },
-    {
-      "id": "9eb52ce9-698d-416e-9b70-d6ec887d9aa2",
-      "fecha": "2026-04-26T18:38:32.556Z",
+      "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
+      "fecha": "2026-04-26T18:29:43.273Z",
       "usuario": "admin",
       "tipo": "maestro",
-      "modulo": "maestro",
-      "ref_id": "b268af55",
-      "detalle": "Editado: Ácido clorhídrico 37% ACS (reactivo)"
+      "modulo": "sistema",
+      "ref_id": "reset",
+      "detalle": "RESET ejecutado por admin. Módulos: reactivos,estandares,columnas,insumos,sol_volumetricas,sol_otras. Maestros: reactivo,estandar,columna,insumo,sol_volumetrica,sol_otra."
     },
     {
       "id": "8d0f8c1b-74ee-4742-a261-5ada02a71bae",
@@ -64,13 +28,60 @@
       "detalle": "Ingreso: Ácido clorhídrico 37% ACS RC26001"
     },
     {
-      "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
-      "fecha": "2026-04-26T18:29:43.273Z",
+      "id": "9eb52ce9-698d-416e-9b70-d6ec887d9aa2",
+      "fecha": "2026-04-26T18:38:32.556Z",
       "usuario": "admin",
       "tipo": "maestro",
-      "modulo": "sistema",
-      "ref_id": "reset",
-      "detalle": "RESET ejecutado por admin. Módulos: reactivos,estandares,columnas,insumos,sol_volumetricas,sol_otras. Maestros: reactivo,estandar,columna,insumo,sol_volumetrica,sol_otra."
+      "modulo": "maestro",
+      "ref_id": "b268af55",
+      "detalle": "Editado: Ácido clorhídrico 37% ACS (reactivo)"
+    },
+    {
+      "id": "7b928f8c-ef4a-4c83-97e9-4c9d5b80cdc4",
+      "fecha": "2026-04-26T18:38:54.658Z",
+      "usuario": "admin",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "detalle": "Consumo directo: 1 ud. cerradas (6→5) | ok1"
+    },
+    {
+      "id": "a39e3dae-6e21-441c-b9e4-4fd623888951",
+      "fecha": "2026-04-26T18:39:19.794Z",
+      "usuario": "admin",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "detalle": "Consumo directo: 1 ud. cerradas (5→4) | 4"
+    },
+    {
+      "id": "b7ad0a06-edea-4a63-842d-6dcb015353ae",
+      "fecha": "2026-04-26T18:39:41.235Z",
+      "usuario": "admin",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "detalle": "Consumo directo: 3 ud. cerradas (4→1) | ok"
+    },
+    {
+      "id": "4693ad2f-5ab6-49bd-8ca7-79aa0c1f43c0",
+      "fecha": "2026-04-26T18:42:36.611Z",
+      "usuario": "admin",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "detalle": "Consumo directo: 3 ud. cerradas (4→1) | ok3"
+    },
+    {
+      "id": "4cf9882e-043a-4a68-8e44-bf5bd5256858",
+      "fecha": "2026-04-26T18:43:10.682Z",
+      "usuario": "admin",
+      "tipo": "ingreso",
+      "modulo": "estandares",
+      "ref_id": "89287c57-7227-4992-aacb-73ede7d7f669",
+      "detalle": "Ingreso: Cafeína USP RS "
     }
-  ]
+  ],
+  "ts_mod": "2026-04-26T19:32:16.412Z",
+  "device_mod": "dev_mog5yptz_wemrz"
 }
