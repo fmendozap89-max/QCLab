@@ -1,0 +1,31 @@
+{
+  "repo_owner": "",
+  "repo_name": "",
+  "pat_hint": "",
+  "alertas_vencimiento_default_meses": 3,
+  "estados_oc": [
+    "Solicitada",
+    "Aprobada",
+    "Enviada",
+    "Recibida",
+    "Cerrada",
+    "Cancelada"
+  ],
+  "validez_soluciones": {
+    "volumetrica": 180,
+    "reactivo": 90,
+    "adecuabilidad": 365
+  },
+  "almacenamientos": [
+    "Freezer",
+    "Heladera",
+    "Ambiente",
+    "Desecador"
+  ],
+  "categorias_estandar": [
+    "USP",
+    "EP",
+    "Sigma",
+    "Trabajo"
+  ]
+}
