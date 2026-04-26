@@ -1,3 +1,19 @@
 {
-  "registros": []
+  "registros": [
+    {
+      "id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "estado": "activo",
+      "maestro_id": "b268af55",
+      "fecha_ingreso": "2026-04-26",
+      "ingresado_por": "admin",
+      "comentarios": [],
+      "codigo_rc": "RC26001",
+      "lote": "HCL1",
+      "cantidad_ingreso": 6,
+      "uds_cerradas": 6,
+      "uds_en_uso": 0,
+      "consumos": [],
+      "vencimiento": "2026-10-27"
+    }
+  ]
 }
