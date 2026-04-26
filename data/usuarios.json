@@ -27,8 +27,15 @@
       "hash": "1o6w0f",
       "display": "JH",
       "role": "usuario"
+    },
+    {
+      "id": "14debc92-c650-47bb-9ec3-d3972686f9be",
+      "username": "NG",
+      "hash": "1qdfec",
+      "display": "NG",
+      "role": "usuario"
     }
   ],
-  "ts_mod": "2026-04-26T20:31:20.044Z",
+  "ts_mod": "2026-04-26T20:31:48.936Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
