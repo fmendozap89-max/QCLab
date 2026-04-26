@@ -510,6 +510,21 @@
 
     <div class="login-title">Iniciar Sesión</div>
     <div class="login-sub">Ingrese sus credenciales para continuar</div>
+
+    <!-- Lista de usuarios disponibles -->
+    <div id="login-user-list" style="margin-bottom:12px">
+      <div style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Usuarios</div>
+      <div id="login-user-chips" style="display:flex;flex-wrap:wrap;gap:6px">
+        ${(STATE.data.usuarios?.lista || DEFAULTS.usuarios.lista).map(u =>
+          `<button onclick="loginSelectUser('${esc(u.username)}','${esc(u.role)}')"
+            style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px">
+            <span style="width:6px;height:6px;border-radius:50%;background:${u.role==='gestor'?'var(--purple)':'var(--accent)'}"></span>
+            ${esc(u.display||u.username)}
+          </button>`
+        ).join('')}
+      </div>
+    </div>
+
     <div class="form-group" style="margin-bottom:10px">
       <label>Usuario</label>
       <input type="text" id="inp-username" placeholder="usuario" autocomplete="username">
@@ -1118,6 +1133,25 @@ function setSyncStatus(s, label) {
 /* ════════════════════════════════════════════════════════════
    AUTH
 ════════════════════════════════════════════════════════════ */
+function loginSelectUser(username, role) {
+  const inp = document.getElementById('inp-username');
+  if (inp) { inp.value = username; }
+  document.getElementById('inp-password')?.focus();
+}
+
+function updateLoginUserChips() {
+  const chips = document.getElementById('login-user-chips');
+  if (!chips) return;
+  const users = STATE.data.usuarios?.lista || DEFAULTS.usuarios.lista;
+  chips.innerHTML = users.map(u =>
+    `<button onclick="loginSelectUser('${esc(u.username)}','${esc(u.role)}')"
+      style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px">
+      <span style="width:6px;height:6px;border-radius:50%;background:${u.role==='gestor'?'var(--purple)':'var(--accent)'}"></span>
+      ${esc(u.display||u.username)}
+    </button>`
+  ).join('');
+}
+
 function toggleLoginSync() {
   const body  = document.getElementById('login-sync-body');
   const arrow = document.getElementById('login-sync-arrow');
@@ -1171,6 +1205,7 @@ async function loginSyncGuardar() {
     STATE.syncInterval = setInterval(syncFromGitHub, 60000);
 
     toast(`Sincronizado (${descargados} archivos). Ya puede iniciar sesion.`, 'success');
+    updateLoginUserChips();
 
   } catch(e) {
     if (status) { status.style.display='block'; status.style.background='rgba(248,81,73,.1)'; status.style.color='var(--red)'; status.style.border='1px solid rgba(248,81,73,.2)'; status.textContent='Error: ' + e.message; }
@@ -1716,13 +1751,30 @@ function renderStockModule(modulo) {
     </div>
     <div class="filter-row">
       <input type="text" placeholder="Buscar…" oninput="filterTable('tbl-${modulo}',this.value)" style="max-width:240px">
+      ${modulo === 'columnas' ? `
+      <select onchange="filterColumnasProp('relleno',this.value)">
+        <option value="">Todos los rellenos</option>
+        ${[...new Set((STATE.data.columnas?.registros||[]).map(r=>{ const a=getMaestroArt(r.maestro_id); return a?.relleno||''; }).filter(Boolean))].sort().map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}
+      </select>
+      <select onchange="filterColumnasProp('dim_l',this.value)">
+        <option value="">L (mm)</option>
+        ${[...new Set((STATE.data.columnas?.registros||[]).map(r=>{ const a=getMaestroArt(r.maestro_id); return a?.dim_l||''; }).filter(Boolean))].sort((a,b)=>a-b).map(v=>`<option value="${v}">${v}</option>`).join('')}
+      </select>
+      <select onchange="filterColumnasProp('dim_di',this.value)">
+        <option value="">Di (mm)</option>
+        ${[...new Set((STATE.data.columnas?.registros||[]).map(r=>{ const a=getMaestroArt(r.maestro_id); return a?.dim_di||''; }).filter(Boolean))].sort((a,b)=>a-b).map(v=>`<option value="${v}">${v}</option>`).join('')}
+      </select>
+      <select onchange="filterColumnasProp('dim_dp',this.value)">
+        <option value="">Dp (µm)</option>
+        ${[...new Set((STATE.data.columnas?.registros||[]).map(r=>{ const a=getMaestroArt(r.maestro_id); return a?.dim_dp||''; }).filter(Boolean))].sort((a,b)=>a-b).map(v=>`<option value="${v}">${v}</option>`).join('')}
+      </select>` : `
       <select onchange="filterByEstVcto('${modulo}',this.value)">
         <option value="">Todos los estados</option>
         <option value="vencido">🔴 Vencidos</option>
         <option value="naranja">🟠 Prox. vencer</option>
         <option value="amarillo">🟡 En aviso</option>
         <option value="vigente">🟢 Vigentes</option>
-      </select>
+      </select>`}
     </div>
     <div class="table-wrap">
       <table id="tbl-${modulo}">
@@ -1821,7 +1873,11 @@ function renderResumenModulo(modulo) {
       const enUso    = activos.filter(r => r.estado_uso === 'en_uso').length;
       const sinUso   = activos.filter(r => r.estado_uso === 'sin_uso').length;
       const fuera    = activos.filter(r => r.estado_uso === 'fuera_de_uso').length;
-      cols += `<td class="col-mono">${activos.length}</td>
+      cols += `<td class="col-mono">${art.relleno||'—'}</td>
+        <td class="col-mono">${art.dim_l??'—'}</td>
+        <td class="col-mono">${art.dim_di??'—'}</td>
+        <td class="col-mono">${art.dim_dp??'—'}</td>
+        <td class="col-mono">${activos.length}</td>
         <td class="col-mono">${enUso}</td>
         <td class="col-mono">${sinUso}</td>
         <td class="col-mono">${fuera}</td>`;
@@ -1857,9 +1913,10 @@ function renderResumenModulo(modulo) {
   });
 
   // Encabezados según módulo
-  let hdrs = '<th>Articulo</th><th>Codigo</th>';
+  const codHeader = isSol ? 'Cod. Base' : 'Cod. ERP';
+  let hdrs = `<th>Articulo</th><th>${codHeader}</th>`;
   if (hasStk)      hdrs += '<th>Cerradas</th><th>En uso</th><th>Minimo</th><th>Estado Stock</th>';
-  if (isCol)       hdrs += '<th>Total</th><th>En uso</th><th>Sin uso</th><th>Fuera de uso</th>';
+  if (isCol)       hdrs += '<th>Relleno</th><th>L (mm)</th><th>Di (mm)</th><th>Dp (µm)</th><th>Total</th><th>En uso</th><th>Sin uso</th><th>Fuera de uso</th>';
   if (isSol)       hdrs += '<th>Estado</th><th>Cod. Prep.</th><th>Vto. Prep.</th><th>Historial</th>';
   if (hasVto && !isSol) hdrs += '<th>Estado VTO</th>';
   hdrs += '<th>Ingresos</th>';
@@ -1875,7 +1932,19 @@ function renderResumenModulo(modulo) {
       </div>
     </div>
     <div class="filter-row">
-      <input type="text" placeholder="Buscar..." oninput="filterTable('${tblId}',this.value)" style="max-width:260px">
+      <input type="text" placeholder="Buscar..." oninput="filterTable('${tblId}',this.value)" style="max-width:220px">
+      ${isCol ? `
+      <select onchange="filterResumenCol('${tblId}','relleno',this.value)">
+        <option value="">Todos los rellenos</option>
+        ${[...new Set(maestros.map(a=>a.relleno).filter(Boolean))].sort().map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('')}
+      </select>
+      <input type="number" id="col-f-l" placeholder="L (mm)" min="0" step="1"
+        oninput="filterResumenColNum('${tblId}')" style="width:80px">
+      <input type="number" id="col-f-di" placeholder="Di (mm)" min="0" step="0.1"
+        oninput="filterResumenColNum('${tblId}')" style="width:80px">
+      <input type="number" id="col-f-dp" placeholder="Dp (µm)" min="0" step="0.1"
+        oninput="filterResumenColNum('${tblId}')" style="width:80px">
+      ` : ''}
     </div>
     <div class="table-wrap">
       <table id="${tblId}">
@@ -1885,6 +1954,37 @@ function renderResumenModulo(modulo) {
     </div>
     <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:right">${maestros.length} articulo(s)</div>
   </div>`;
+}
+
+/* Filtro por relleno (texto exacto en columna 3) para Resumen Columnas */
+function filterResumenCol(tblId, campo, valor) {
+  const tbl = document.getElementById(tblId);
+  if (!tbl) return;
+  // Guardar el filtro activo
+  if (!window._colFiltros) window._colFiltros = {};
+  window._colFiltros[campo] = valor;
+  _aplicarFiltrosCol(tbl);
+}
+function filterResumenColNum(tblId) {
+  const tbl = document.getElementById(tblId);
+  if (!tbl) return;
+  if (!window._colFiltros) window._colFiltros = {};
+  window._colFiltros.l  = document.getElementById('col-f-l')?.value  || '';
+  window._colFiltros.di = document.getElementById('col-f-di')?.value || '';
+  window._colFiltros.dp = document.getElementById('col-f-dp')?.value || '';
+  _aplicarFiltrosCol(tbl);
+}
+function _aplicarFiltrosCol(tbl) {
+  const f = window._colFiltros || {};
+  tbl.querySelectorAll('tbody tr').forEach(tr => {
+    const celdas = [...tr.querySelectorAll('td')].map(td => td.textContent.trim());
+    // celdas[0]=Articulo, [1]=CodERP, [2]=Relleno, [3]=L, [4]=Di, [5]=Dp, [6]=Total...
+    const okR  = !f.relleno || celdas[2] === f.relleno;
+    const okL  = !f.l       || celdas[3] === f.l;
+    const okDi = !f.di      || celdas[4] === f.di;
+    const okDp = !f.dp      || celdas[5] === f.dp;
+    tr.style.display = (okR && okL && okDi && okDp) ? '' : 'none';
+  });
 }
 
 function exportResumenModulo(modulo, tblId) {
@@ -1963,7 +2063,10 @@ function renderStockRow(modulo, r, cfg) {
   </div>`;
 
   const estVto = calcEstadoVencimiento(r.vencimiento, r.aviso_meses || 3);
-  return `<tr data-vcto="${estVto.estado}" data-estado="${r.estado_uso||r.estado||''}">
+  const art2   = getMaestroArt(r.maestro_id);
+  return `<tr data-vcto="${estVto.estado}" data-estado="${r.estado_uso||r.estado||''}"
+    data-relleno="${art2?.relleno||''}" data-diml="${art2?.dim_l||''}"
+    data-dimdi="${art2?.dim_di||''}" data-dimdp="${art2?.dim_dp||''}">
     ${cells}<td>${actions}</td>
   </tr>`;
 }
@@ -2116,12 +2219,25 @@ function toggleGrouped(modulo) {
   if (lbl) lbl.textContent = groupedVisible[modulo] ? '📋 Ver Individual' : '📊 Ver Agrupado';
 }
 
-function filterTable(modulo, q) {
-  const tbl = document.getElementById('tbl-' + modulo);
+function filterTable(idOrModulo, q) {
+  // Acepta tanto el ID completo como solo el modulo (agrega prefijo tbl-)
+  const tbl = document.getElementById(idOrModulo)
+           || document.getElementById('tbl-' + idOrModulo);
   if (!tbl) return;
-  q = q.toLowerCase();
+  q = (q||'').toLowerCase().trim();
   tbl.querySelectorAll('tbody tr').forEach(tr => {
-    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+    const txt = tr.textContent.replace(/\s+/g,' ').toLowerCase();
+    tr.style.display = (!q || txt.includes(q)) ? '' : 'none';
+  });
+}
+
+function filterColumnasProp(prop, val) {
+  const tbl = document.getElementById('tbl-columnas');
+  if (!tbl) return;
+  const dataKey = { relleno:'relleno', dim_l:'diml', dim_di:'dimdi', dim_dp:'dimdp' }[prop] || prop;
+  tbl.querySelectorAll('tbody tr').forEach(tr => {
+    if (!val) { tr.style.display = ''; return; }
+    tr.style.display = tr.dataset[dataKey] == val ? '' : 'none';
   });
 }
 
@@ -5046,12 +5162,34 @@ function renderUsuariosConfig() {
             <td class="col-mono">${esc(u.username)}</td>
             <td>${esc(u.display)}</td>
             <td><span class="badge ${u.role==='gestor'?'badge-purple':'badge-blue'}">${u.role}</span></td>
-            <td><button class="btn btn-secondary btn-sm" onclick="resetPassword('${u.id}')">🔑 Reset Pass</button></td>
+            <td style="display:flex;gap:6px">
+              <button class="btn btn-secondary btn-sm" onclick="resetPassword('${u.id}')">🔑 Reset Pass</button>
+              <button class="btn btn-danger btn-sm" onclick="eliminarUsuario('${u.id}','${esc(u.username)}')"
+                ${u.id===STATE.session?.id?' disabled title="No puede eliminarse a si mismo"':''}>🗑</button>
+            </td>
           </tr>`).join('')}
         </tbody>
       </table>
     </div>
     <button class="btn btn-secondary btn-sm" onclick="openAddUsuario()">+ Nuevo Usuario</button>`;
+}
+
+async function eliminarUsuario(id, username) {
+  if (id === STATE.session?.id) { toast('No puede eliminarse a si mismo', 'error'); return; }
+  openModal('Confirmar eliminacion',
+    `<p style="font-size:12px">¿Eliminar el usuario <strong>${esc(username)}</strong>? Esta accion no se puede deshacer.</p>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+     <button class="btn btn-danger" onclick="closeModal();_doEliminarUsuario('${id}','${esc(username)}')">Eliminar</button>`
+  );
+}
+async function _doEliminarUsuario(id, username) {
+  if (!STATE.data.usuarios) return;
+  STATE.data.usuarios.lista = STATE.data.usuarios.lista.filter(u => u.id !== id);
+  await pushToGitHub('usuarios');
+  registrarMovimiento('edicion', 'usuarios', id, `Usuario eliminado: ${username}`);
+  await pushToGitHub('movimientos');
+  renderPage(STATE.page);
+  toast(`Usuario "${username}" eliminado`, 'success');
 }
 
 function openAddUsuario() {
