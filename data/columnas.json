@@ -1,5 +1,21 @@
 {
-  "registros": [],
-  "ts_mod": "2026-04-26T20:59:01.759Z",
+  "registros": [
+    {
+      "id": "274d7632-be46-4e5f-a976-a9afa77817ee",
+      "estado": "activo",
+      "maestro_id": "a977d850",
+      "fecha_ingreso": "2026-04-26",
+      "ingresado_por": "FM",
+      "ts_mod": "2026-04-26T20:59:17.561Z",
+      "comentarios": [],
+      "codigo_interno": "2",
+      "lote_serie": "2",
+      "uso": "General",
+      "uso_dedicado": null,
+      "estado_uso": "sin_uso",
+      "puesta_en_uso": null
+    }
+  ],
+  "ts_mod": "2026-04-26T20:59:17.562Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
