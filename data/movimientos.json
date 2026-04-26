@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "7d150d21-e8f5-4d79-85fb-3e8fffe1ed22",
+      "fecha": "2026-04-26T20:48:13.507Z",
+      "usuario": "FM",
+      "tipo": "edicion",
+      "modulo": "usuarios",
+      "ref_id": "u1",
+      "detalle": "Usuario eliminado: admin"
+    },
+    {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
       "fecha": "2026-04-26T18:29:43.273Z",
       "usuario": "admin",
@@ -100,6 +109,6 @@
       "detalle": "Usuario eliminado: usuario"
     }
   ],
-  "ts_mod": "2026-04-26T20:32:16.485Z",
+  "ts_mod": "2026-04-26T20:48:13.507Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
