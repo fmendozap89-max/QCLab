@@ -63,7 +63,16 @@
       "codigo": "SVH-C17",
       "fecha_prep": "2026-04-26",
       "vencimiento": "2027-04-26",
-      "titulos": []
+      "titulos": [
+        {
+          "id": "8cf6ad17-def2-4164-8d5a-89d591684c2a",
+          "fecha_titulo": "2026-04-26",
+          "vencimiento_titulo": "2026-05-26",
+          "valor": 0.125,
+          "usuario": "admin",
+          "analista": "admin"
+        }
+      ]
     }
   ]
 }
