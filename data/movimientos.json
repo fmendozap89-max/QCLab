@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "4cf9882e-043a-4a68-8e44-bf5bd5256858",
+      "fecha": "2026-04-26T18:43:10.682Z",
+      "usuario": "admin",
+      "tipo": "ingreso",
+      "modulo": "estandares",
+      "ref_id": "89287c57-7227-4992-aacb-73ede7d7f669",
+      "detalle": "Ingreso: Cafeína USP RS "
+    },
+    {
       "id": "4693ad2f-5ab6-49bd-8ca7-79aa0c1f43c0",
       "fecha": "2026-04-26T18:42:36.611Z",
       "usuario": "admin",
