@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "2f92662b-4226-486b-a74c-1ba7f9d16bab",
+      "fecha": "2026-04-26T17:43:01.693Z",
+      "usuario": "admin",
+      "tipo": "ingreso",
+      "modulo": "sol_volumetricas",
+      "ref_id": "c84de9f0-97ba-47cc-a674-6241fa4081f5",
+      "detalle": "Ingreso: NaOH 0.1 N SVH-C17"
+    },
+    {
       "id": "b3e70d20-7518-453f-b789-b836e91b7c7b",
       "fecha": "2026-04-26T17:42:11.606Z",
       "usuario": "admin",
