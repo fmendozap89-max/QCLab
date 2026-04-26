@@ -26,8 +26,8 @@
       "codigo_rc": "RC26001",
       "lote": "L-2024-001",
       "cantidad_ingreso": 4,
-      "uds_cerradas": 3,
-      "uds_en_uso": 0,
+      "uds_cerradas": 2,
+      "uds_en_uso": 1,
       "consumos": [
         {
           "id": "485b5f67-95a4-4968-b097-83bd549dc23a",
@@ -44,6 +44,14 @@
           "cantidad": 1,
           "usuario": "admin",
           "obs": "se terminó"
+        },
+        {
+          "id": "706f63bf-d7d8-4ca9-9614-e799140ae390",
+          "fecha": "2026-04-26T17:34:05.486Z",
+          "tipo": "abrir",
+          "cantidad": 1,
+          "usuario": "admin",
+          "obs": "ok"
         }
       ],
       "vencimiento": "2026-06-29"
