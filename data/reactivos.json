@@ -10,8 +10,8 @@
       "codigo_rc": "RC26001",
       "lote": "HCL1",
       "cantidad_ingreso": 6,
-      "uds_cerradas": 1,
-      "uds_en_uso": 0,
+      "uds_cerradas": 0,
+      "uds_en_uso": 1,
       "consumos": [
         {
           "id": "61061ffd-fd1c-497d-b26b-41428c2e3434",
@@ -36,9 +36,19 @@
           "cantidad": 3,
           "usuario": "admin",
           "obs": "ok3"
+        },
+        {
+          "id": "075b448f-3492-41af-82e9-3479e241c329",
+          "fecha": "2026-04-26T20:08:19.889Z",
+          "tipo": "abrir",
+          "cantidad": 1,
+          "usuario": "usuario",
+          "obs": "ok",
+          "aprobado_por": "FM"
         }
       ],
-      "vencimiento": "2026-10-27"
+      "vencimiento": "2026-10-27",
+      "ts_mod": "2026-04-26T20:08:19.889Z"
     }
   ],
   "ts_mod": "2026-04-26T20:05:56.891Z",
