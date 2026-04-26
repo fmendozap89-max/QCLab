@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "978a56d5-afe3-4372-8e6d-27a654bc1e9c",
-      "fecha": "2026-04-26T17:56:45.318Z",
+      "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
+      "fecha": "2026-04-26T18:29:43.273Z",
       "usuario": "admin",
       "tipo": "maestro",
       "modulo": "sistema",
       "ref_id": "reset",
-      "detalle": "RESET ejecutado por admin. Módulos: reactivos,estandares,columnas,insumos,sol_volumetricas,sol_otras. Maestros: reactivo,estandar,columna,insumo,solucion."
+      "detalle": "RESET ejecutado por admin. Módulos: reactivos,estandares,columnas,insumos,sol_volumetricas,sol_otras. Maestros: reactivo,estandar,columna,insumo,sol_volumetrica,sol_otra."
     }
   ]
 }
