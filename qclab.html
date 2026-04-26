@@ -1440,7 +1440,7 @@ function renderDashboard() {
   const cntSol = (m) => (STATE.data[m]?.registros || []).filter(r=>r.estado==='en_uso').length;
   const venc = (m) => (STATE.data[m]?.registros || []).filter(r => {
     if (r.estado !== 'activo') return false;
-    const ev = calcEstadoVencimiento(r.vencimiento || r.vencimiento_titulo, r.aviso_meses || STATE.data.config?.alertas_vencimiento_default_meses || 3);
+    const ev = calcEstadoVencimiento(r.vencimiento || r.vencimiento_titulo, getAvisoMeses(r));
     return ev.estado === 'vencido' || ev.estado === 'naranja' || ev.estado === 'amarillo';
   }).length;
   const vencSol = (m) => (STATE.data[m]?.registros || []).filter(r => {
@@ -1533,7 +1533,7 @@ function getAlertasStock(modulo) {
     if (vistos.has(r.maestro_id)) continue;
     vistos.add(r.maestro_id);
     const art = maestro.find(a => a.id === r.maestro_id);
-    const min = art?.stock_minimo || r.stock_minimo;
+    const min = art?.stock_minimo;
     if (!min) continue;
     const stock = calcStockAgrupado(modulo, r.maestro_id);
     if (stock < min) {
@@ -1614,10 +1614,8 @@ const MODULE_CFG = {
       { k:'codigo_interno', h:'Cód. Int.',  mono:true },
       { k:'descripcion',    h:'Descripción',fn:(r)=>getMaestroDesc(r.maestro_id) },
       { k:'lote_serie',     h:'Lote/Serie', mono:true },
-      { k:'relleno',        h:'Relleno',    fn:(r)=>r.relleno||'—' },
-      { k:'dim_l',          h:'L (mm)',     fn:(r)=>r.dim_l||'—' },
-      { k:'dim_di',         h:'Di (mm)',    fn:(r)=>r.dim_di||'—' },
-      { k:'dim_dp',         h:'Dp (µm)',    fn:(r)=>r.dim_dp||'—' },
+      { k:'_relleno',       h:'Relleno',    fn:(r)=>{ const a=getMaestroArt(r.maestro_id); return a?.relleno||'—'; } },
+      { k:'_dims',          h:'L×Di×Dp',    fn:(r)=>{ const a=getMaestroArt(r.maestro_id); return a?(a.dim_l||'?')+'×'+(a.dim_di||'?')+'×'+(a.dim_dp||'?'):'—'; } },
       { k:'uso',            h:'Uso',        fn:(r)=>r.uso||'—' },
       { k:'uso_dedicado',   h:'Ensayo/Ded.',fn:(r)=>r.uso==='Dedicado'?(r.uso_dedicado||'—'):'—' },
       { k:'puesta_en_uso',  h:'P. en Uso',  fn:(r)=>fmtDate(r.puesta_en_uso) },
@@ -1693,6 +1691,15 @@ function getMaestroArt(id) {
   return (STATE.data.maestro?.articulos||[]).find(a=>a.id===id) || null;
 }
 
+/* Lee aviso_meses SIEMPRE del Maestro — nunca del registro de stock.
+   Garantiza que cambios en el Maestro se reflejan en tiempo real. */
+function getAvisoMeses(r) {
+  const art = getMaestroArt(r?.maestro_id);
+  return art?.aviso_meses
+    || STATE.data.config?.alertas_vencimiento_default_meses
+    || 3;
+}
+
 /* Badge de stock basado en unidades CERRADAS vs minimo del Maestro.
    Aviso: uds_cerradas < stock_minimo (estricto — exactamente en el minimo no dispara) */
 function badgeStockCerradas(r) {
@@ -1722,8 +1729,9 @@ function badgeEstado(estado) {
 }
 
 function badgeStockMin(r) {
+  const art  = getMaestroArt(r.maestro_id);
   const cant = Number(r.cantidad)||0;
-  const min  = Number(r.stock_minimo)||0;
+  const min  = art?.stock_minimo || Number(r.stock_minimo) || 0;
   if (!min) return '<span class="badge badge-gray">S/D</span>';
   if (cant < min) return '<span class="badge badge-red">↓ Bajo</span>';
   if (cant < min * 1.5) return '<span class="badge badge-yellow">⚠ Bajo</span>';
@@ -1990,11 +1998,20 @@ function _aplicarFiltrosCol(tbl) {
 function exportResumenModulo(modulo, tblId) {
   if (!window.XLSX) { toast('Libreria XLSX no disponible','error'); return; }
   const tbl = document.getElementById(tblId);
-  if (!tbl) return;
-  const ws = XLSX.utils.table_to_sheet(tbl);
+  if (!tbl) { toast('Tabla no encontrada','error'); return; }
+  // Extraer solo filas visibles (respeta filtros activos)
+  const hdrs = [...tbl.querySelectorAll('thead th')].map(th => th.textContent.trim());
+  const filas = [...tbl.querySelectorAll('tbody tr')]
+    .filter(tr => tr.style.display !== 'none')
+    .map(tr => [...tr.querySelectorAll('td')].map(td => td.textContent.trim()));
+  if (!filas.length) { toast('Sin filas visibles para exportar','warning'); return; }
+  const data = [hdrs, ...filas];
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols'] = hdrs.map(h => ({ wch: Math.min(40, Math.max(10, h.length + 4)) }));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, ('Resumen_' + modulo).slice(0,31));
   XLSX.writeFile(wb, `QCLab_Resumen_${modulo}_${today()}.xlsx`);
+  toast('Excel generado','success');
 }
 
 function solicitarCreacionSolucion() {
@@ -2062,7 +2079,7 @@ function renderStockRow(modulo, r, cfg) {
       onclick="addComment('${modulo}','${r.id}')" title="Comentario">💬</button>
   </div>`;
 
-  const estVto = calcEstadoVencimiento(r.vencimiento, r.aviso_meses || 3);
+  const estVto = calcEstadoVencimiento(r.vencimiento, getAvisoMeses(r));
   const art2   = getMaestroArt(r.maestro_id);
   return `<tr data-vcto="${estVto.estado}" data-estado="${r.estado_uso||r.estado||''}"
     data-relleno="${art2?.relleno||''}" data-diml="${art2?.dim_l||''}"
@@ -2080,13 +2097,13 @@ function renderGroupedView(modulo) {
   for (const r of registros) {
     if (r.estado === 'dado_de_baja') continue;
     const key = r.maestro_id || 'sin_maestro';
-    if (!grupos[key]) grupos[key] = { maestroId: r.maestro_id, registros: [], stockMinimo: r.stock_minimo };
+    if (!grupos[key]) grupos[key] = { maestroId: r.maestro_id, registros: [] };
     grupos[key].registros.push(r);
   }
   const rows = Object.values(grupos).map(g => {
     const art = maestro.find(a=>a.id===g.maestroId);
     const total = g.registros.reduce((s,r)=>s+(Number(r.cantidad_total)||Number(r.cantidad)||0),0);
-    const min = g.stockMinimo || 0;
+    const min = art?.stock_minimo || 0;
     const ok = !min || total >= min;
     return `<tr>
       <td>${art?esc(art.descripcion):'<span class="text-muted">Sin maestro</span>'}</td>
@@ -2313,17 +2330,11 @@ function buildAddForm(modulo) {
           <select id="f-maestro_id"><option value="">Seleccione…</option>${maestroOptions('columna')}</select></div>
         <div class="form-group"><label>Código Interno<span class="req">*</span></label><input type="text" id="f-codigo_interno"></div>
         <div class="form-group"><label>Lote/Serie</label><input type="text" id="f-lote_serie"></div>
-        <div class="form-group"><label>Relleno (USP)</label><input type="text" id="f-relleno" placeholder="L1, L7, etc.">
-          <span class="form-hint">Nomenclatura farmacopea USP</span></div>
-        <div class="form-group"><label>L — Largo (mm)</label><input type="number" id="f-dim_l" placeholder="150" min="0" step="0.1"></div>
-        <div class="form-group"><label>Di — Diám. Interno (mm)</label><input type="number" id="f-dim_di" placeholder="4.6" min="0" step="0.01"></div>
-        <div class="form-group"><label>Dp — Diám. Partícula (µm)</label><input type="number" id="f-dim_dp" placeholder="5" min="0" step="0.1"></div>
         <div class="form-group"><label>Uso</label>
           <select id="f-uso" onchange="toggleDedicadoField()"><option value="General">General</option><option value="Dedicado">Dedicado</option></select></div>
         <div class="form-group" id="f-uso-dedicado-row" style="display:none">
           <label>Ensayo/Producto Dedicado</label>
           <input type="text" id="f-uso_dedicado" placeholder="Ej: Metformina — HPLC Q3">
-          <span class="form-hint">Describir para qué ensayo o producto es exclusiva</span>
         </div>
         <div class="form-group"><label>Puesta en Uso</label><input type="date" id="f-puesta_en_uso"></div>
       </div>`,
@@ -2945,7 +2956,7 @@ function openDetailModal(modulo, id) {
   const r = (STATE.data[modulo]?.registros||[]).find(x=>x.id===id);
   if (!r) return;
   const art = (STATE.data.maestro?.articulos||[]).find(a=>a.id===r.maestro_id);
-  const ev  = calcEstadoVencimiento(r.vencimiento, r.aviso_meses||3);
+  const ev  = calcEstadoVencimiento(r.vencimiento, getAvisoMeses(r));
 
   const comentariosHtml = (r.comentarios||[]).map(c=>`
     <div style="background:var(--bg3);border-radius:var(--r);padding:8px 10px;margin-bottom:6px">
@@ -2977,21 +2988,21 @@ function openDetailModal(modulo, id) {
 
   const body = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px">
-      <div><strong>Artículo:</strong> ${art?esc(art.descripcion):'—'}</div>
-      <div><strong>Cód. ERP:</strong> ${art?.codigo_erp||'—'}</div>
+      <div><strong>Articulo:</strong> ${art?esc(art.descripcion):'—'}</div>
+      <div><strong>Cod. ERP:</strong> ${art?.codigo_erp||art?.codigo_base||'—'}</div>
       ${art?.numero_cas?`<div><strong>N° CAS:</strong> <span class="col-mono">${esc(art.numero_cas)}</span></div>`:''}
-      ${r.codigo_rc?`<div><strong>Código RC:</strong> <span class="col-mono">${esc(r.codigo_rc)}</span></div>`:''}
-      ${r.codigo?`<div><strong>Código:</strong> <span class="col-mono">${esc(r.codigo)}</span></div>`:''}
+      ${r.codigo_rc?`<div><strong>Codigo RC:</strong> <span class="col-mono">${esc(r.codigo_rc)}</span></div>`:''}
+      ${r.codigo?`<div><strong>Codigo:</strong> <span class="col-mono">${esc(r.codigo)}</span></div>`:''}
       ${r.lote?`<div><strong>Lote:</strong> <span class="col-mono">${esc(r.lote)}</span></div>`:''}
       ${r.lote_serie?`<div><strong>Lote/Serie:</strong> <span class="col-mono">${esc(r.lote_serie)}</span></div>`:''}
-      ${r.relleno?`<div><strong>Relleno (USP):</strong> ${esc(r.relleno)}</div>`:''}
-      ${r.dim_l||r.dim_di||r.dim_dp?`<div><strong>Dimensiones:</strong> L=${r.dim_l||'?'}mm · Di=${r.dim_di||'?'}mm · Dp=${r.dim_dp||'?'}µm</div>`:''}
+      ${art?.relleno?`<div><strong>Relleno (USP):</strong> ${esc(art.relleno)}</div>`:''}
+      ${art?.dim_l||art?.dim_di||art?.dim_dp?`<div><strong>Dimensiones:</strong> L=${art?.dim_l||'?'}mm · Di=${art?.dim_di||'?'}mm · Dp=${art?.dim_dp||'?'}µm</div>`:''}
       ${r.uso?`<div><strong>Uso:</strong> ${esc(r.uso)}${r.uso==='Dedicado'&&r.uso_dedicado?' — '+esc(r.uso_dedicado):''}</div>`:''}
       ${r.vencimiento?`<div><strong>Vencimiento:</strong> ${fmtDate(r.vencimiento)} <span class="badge ${ev.cls}">${ev.label}</span></div>`:''}
-      ${r.almacenamiento?`<div><strong>Almacenamiento:</strong> ${r.almacenamiento}</div>`:''}
-      ${r.cantidad_total?`<div><strong>Stock Total:</strong> ${r.cantidad_total} ${r.unidad||''}</div>`:''}
-      ${r.cantidad?`<div><strong>Cantidad:</strong> ${r.cantidad} ${r.unidad||''}</div>`:''}
-      ${r.stock_minimo?`<div><strong>Stock Mín.:</strong> ${r.stock_minimo}</div>`:''}
+      ${art?.almacenamiento?`<div><strong>Almacenamiento:</strong> ${esc(art.almacenamiento)}</div>`:''}
+      ${art?.unidad?`<div><strong>Unidad:</strong> ${esc(art.unidad)}</div>`:''}
+      ${art?.stock_minimo?`<div><strong>Stock Min. (Maestro):</strong> ${art.stock_minimo} ${art.unidad||''}</div>`:''}
+      ${art?.aviso_val?`<div><strong>Aviso VTO (Maestro):</strong> ${art.aviso_val} ${art.aviso_uni||''}</div>`:''}
       <div><strong>Estado:</strong> ${badgeEstado(r.estado)}</div>
       <div><strong>Ingresado:</strong> ${fmtDate(r.fecha_ingreso)} por ${esc(r.ingresado_por)}</div>
     </div>
@@ -3612,13 +3623,13 @@ function filtrarStockGeneral() {
 }
 
 function copiarStockGeneral() {
-  const filas = STATE._sgFilas || [];
-  const hdrs  = ['Articulo','Tipo','Codigo','Cerradas','Unidad','En uso','Minimo','Estado Stock','Prox. VTO','Ingresos'];
-  const lines = [hdrs.join('\t')];
-  for (const f of filas) {
-    const tr = document.getElementById('tbl-stock-general')?.querySelector(`tr[data-tipo="${f.tipo}"]`);
-    lines.push(f.export.join('\t'));
-  }
+  const tbl = document.getElementById('tbl-stock-general');
+  if (!tbl) { toast('Tabla no visible','error'); return; }
+  const hdrs = [...tbl.querySelectorAll('thead th')].map(th=>th.textContent.trim());
+  const filas = [...tbl.querySelectorAll('tbody tr')]
+    .filter(tr=>tr.style.display!=='none')
+    .map(tr=>[...tr.querySelectorAll('td')].map(td=>td.textContent.trim()));
+  const lines = [hdrs.join('\t'), ...filas.map(f=>f.join('\t'))];
   navigator.clipboard?.writeText(lines.join('\n'))
     .then(()=>toast('Tabla copiada al portapapeles','success'))
     .catch(()=>toast('No se pudo copiar','error'));
@@ -3626,15 +3637,41 @@ function copiarStockGeneral() {
 
 function exportarStockGeneral() {
   if (!window.XLSX) { toast('Libreria XLSX no disponible','error'); return; }
-  const filas = STATE._sgFilas || [];
-  const hdrs  = ['Articulo','Tipo','Codigo','Cerradas','Unidad','En uso','Minimo','Estado Stock','Prox. VTO','Ingresos'];
-  const data  = [hdrs, ...filas.map(f=>f.export)];
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  // Anchos de columna
+  // Calcular filas frescas sin depender del estado del DOM
+  const modMap  = { reactivo:'reactivos', estandar:'estandares', columna:'columnas',
+    insumo:'insumos', sol_volumetrica:'sol_volumetricas', sol_otra:'sol_otras' };
+  const tipoLabel = { reactivo:'Reactivo', estandar:'Estandar', columna:'Columna Cromat.',
+    insumo:'Insumo', sol_volumetrica:'Sol. Volumetrica', sol_otra:'Sol. Reactivo/Adec.' };
+  const maestros = STATE.data.maestro?.articulos || [];
+  const hdrs = ['Articulo','Tipo','Codigo','Cerradas','Unidad','En uso','Minimo','Estado Stock','Prox. VTO','Ingresos'];
+  const filas = [];
+  for (const art of maestros) {
+    if (art.activo === false) continue;
+    const mod = modMap[art.tipo]; if (!mod) continue;
+    const regs = (STATE.data[mod]?.registros||[]).filter(r=>r.maestro_id===art.id&&r.estado!=='dado_de_baja');
+    const activos = regs.filter(r=>r.estado==='activo'||r.estado==='en_uso');
+    const cerradas = activos.reduce((s,r)=>s+(r.uds_cerradas??0),0);
+    const enUso    = activos.reduce((s,r)=>s+(r.uds_en_uso??0),0);
+    const min = art.stock_minimo||0;
+    const ud  = art.unidad||'';
+    let estado;
+    if (!regs.length)             estado = 'Sin ingresos';
+    else if (!activos.length)     estado = 'Agotado';
+    else if (min && cerradas<min) estado = 'Bajo stock';
+    else if (min)                 estado = 'OK';
+    else                          estado = 'Sin minimo';
+    const vtoTexto = activos.map(r=>r.vencimiento).filter(Boolean).sort()[0]||'';
+    filas.push([art.descripcion, tipoLabel[art.tipo]||art.tipo,
+      art.codigo_erp||art.codigo_base||'', cerradas, ud, enUso, min||'',
+      estado, vtoTexto, regs.length]);
+  }
+  if (!filas.length) { toast('Sin datos para exportar','warning'); return; }
+  const ws = XLSX.utils.aoa_to_sheet([hdrs, ...filas]);
   ws['!cols'] = [38,18,14,10,8,8,8,14,12,10].map(w=>({wch:w}));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Stock General');
   XLSX.writeFile(wb, `QCLab_StockGeneral_${today()}.xlsx`);
+  toast('Excel generado','success');
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -4617,7 +4654,9 @@ async function resolverConflictoMaestro(decision) {
 }
 
 function exportMaestroExcel(modulo) {
-  exportToExcel('maestro_' + modulo);
+  // modulo puede ser 'reactivos', 'columnas', etc. → tipo maestro 'reactivo', 'columna'
+  const tipo = MAESTRO_TIPO_MAP[modulo] || modulo;
+  exportToExcel('maestro_' + tipo);
 }
 
 function filterMaestroTipo(tipo) {
@@ -5402,8 +5441,9 @@ function addTag(containerId, inputId, cfgKey) {
 function copyTableToClipboard(tableId) {
   const tbl = document.getElementById(tableId);
   if (!tbl) return;
+  const visibleRows = [...tbl.rows].filter(tr => tr.style.display !== 'none');
   let html = '<table border="1" style="border-collapse:collapse">';
-  for (const row of tbl.rows) {
+  for (const row of visibleRows) {
     html += '<tr>';
     for (const cell of row.cells) {
       const tag = cell.tagName === 'TH' ? 'th' : 'td';
@@ -5413,7 +5453,7 @@ function copyTableToClipboard(tableId) {
   }
   html += '</table>';
   const blob = new Blob([html], { type: 'text/html' });
-  const textBlob = new Blob([Array.from(tbl.rows).map(r =>
+  const textBlob = new Blob([visibleRows.map(r =>
     Array.from(r.cells).map(c => c.innerText.trim().replace(/\n/g,' ')).join('\t')
   ).join('\n')], { type: 'text/plain' });
 
@@ -5434,32 +5474,55 @@ function exportToExcel(modulo) {
   const wb = XLSX.utils.book_new();
 
   const getSheetData = (m) => {
+    // ── Audit ──
     if (m === 'audit') {
       const log = STATE.data.movimientos?.log || [];
-      return [['Fecha','Usuario','Tipo','Módulo','Detalle'],
-        ...log.map(l=>[new Date(l.fecha).toLocaleString('es-UY'),l.usuario,l.tipo,l.modulo,l.detalle])];
+      return [['Fecha','Usuario','Tipo','Modulo','Detalle'],
+        ...log.map(l=>[new Date(l.fecha).toLocaleString('es-UY'),l.usuario||'',l.tipo||'',l.modulo||'',l.detalle||''])];
     }
-    if (m === 'maestro') {
-      const arts = STATE.data.maestro?.articulos || [];
-      return [['Descripción','Cód. ERP','Unidad','Tipo','Activo'],
-        ...arts.map(a=>[a.descripcion,a.codigo_erp||'',a.unidad||'',a.tipo||'',a.activo!==false?'Sí':'No'])];
-    }
+    // ── Compras ──
     if (m === 'compras') {
       const ords = STATE.data.compras?.ordenes || [];
-      return [['N° OC','Tipo','Descripción','Cód. ERP','F. Solicitud','F. Entrega Est.','F. Recepción','Estado'],
-        ...ords.map(o=>[o.numero_oc||'',o.tipo_articulo||'',o.descripcion_libre||getMaestroDescPlain(o.maestro_id),
-          o.codigo_erp||'',o.fecha_solicitud||'',o.fecha_entrega_estimada||'',o.fecha_recepcion||'',o.estado||''])];
+      return [['N° OC','Tipo','Descripcion','Cod. ERP','F. Solicitud','F. Entrega Est.','F. Recepcion','Estado'],
+        ...ords.map(o=>[o.numero_oc||'',o.tipo_articulo||'',
+          o.descripcion_libre||getMaestroDescPlain(o.maestro_id)||'',
+          o.codigo_erp||'',o.fecha_solicitud||'',o.fecha_entrega_estimada||'',
+          o.fecha_recepcion||'',o.estado||''])];
     }
-    // módulos de stock
+    // ── Maestro por tipo (ej: maestro_reactivo, maestro_columna…) ──
+    if (m.startsWith('maestro_') || m === 'maestro') {
+      const tipo = m === 'maestro' ? null : m.replace('maestro_','');
+      const arts = (STATE.data.maestro?.articulos||[]).filter(a => !tipo || a.tipo === tipo);
+      if (!arts.length) return [];
+      // Determinar columnas según tipo
+      const t = tipo || arts[0]?.tipo || '';
+      const base = ['descripcion','codigo_erp','codigo_base','tipo','activo','observaciones'];
+      const extra = {
+        reactivo:        ['numero_cas','unidad','almacenamiento','stock_minimo','aviso_val','aviso_uni'],
+        estandar:        ['unidad','almacenamiento','stock_minimo','aviso_val','aviso_uni','uso_producto'],
+        columna:         ['relleno','dim_l','dim_di','dim_dp'],
+        insumo:          ['unidad','stock_minimo','aviso_val','aviso_uni'],
+        sol_volumetrica: ['validez_prep_val','validez_prep_uni','validez_tit_val','validez_tit_uni','aviso_val','aviso_uni'],
+        sol_otra:        ['tipo_solucion','validez_prep_val','validez_prep_uni','aviso_val','aviso_uni'],
+      };
+      const cols = [...base, ...(extra[t]||[])];
+      return [cols, ...arts.map(a => cols.map(c => a[c]??''))];
+    }
+    // ── Módulos de stock ──
     const cfg = MODULE_CFG[m];
     if (!cfg) return [];
-    const headers = cfg.cols.map(c=>c.h).concat(['Estado Reg.']);
+    // Cabeceras: texto limpio de los encabezados de columna + campos adicionales útiles
+    const headers = cfg.cols.map(c => c.h).concat(['Estado','Fecha Ingreso','Ingresado por']);
     const rows = (STATE.data[m]?.registros||[]).map(r => {
+      const art = getMaestroArt(r.maestro_id);
       const cells = cfg.cols.map(c => {
-        if (c.fn) return stripHtml(c.fn(r));
+        if (c.fn) {
+          // Ejecutar fn y quitar HTML
+          try { return stripHtml(c.fn(r)); } catch { return ''; }
+        }
         return r[c.k] ?? '';
       });
-      cells.push(r.estado||'');
+      cells.push(r.estado||'', r.fecha_ingreso||'', r.ingresado_por||'');
       return cells;
     });
     return [headers, ...rows];
@@ -5469,15 +5532,21 @@ function exportToExcel(modulo) {
     ? ['reactivos','estandares','columnas','insumos','sol_volumetricas','sol_otras','compras','maestro','audit']
     : [modulo];
 
+  let hojas = 0;
   for (const m of modules) {
     const data = getSheetData(m);
-    if (!data.length) continue;
+    if (!data.length || data.length < 2) continue;
     const ws = XLSX.utils.aoa_to_sheet(data);
-    XLSX.utils.book_append_sheet(wb, ws, m.slice(0,31));
+    // Anchos automáticos aproximados
+    if (data[0]) ws['!cols'] = data[0].map(h => ({ wch: Math.min(40, Math.max(10, String(h||'').length + 4)) }));
+    const sheetName = m.replace('maestro_','M_').slice(0,31);
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    hojas++;
   }
 
+  if (!hojas) { toast('No hay datos para exportar','warning'); return; }
   XLSX.writeFile(wb, `QCLab_${modulo}_${today()}.xlsx`);
-  toast('Archivo Excel generado','success');
+  toast(`Excel generado (${hojas} hoja${hojas>1?'s':''})`, 'success');
 }
 
 function getMaestroDescPlain(id) {
@@ -5521,10 +5590,16 @@ function processImport(modulo) {
       let importados = 0, alertas = 0;
       for (const row of rows) {
         const r = { id:uuid(), estado:'activo', fecha_ingreso:today(), ingresado_por:STATE.session?.username, comentarios:[] };
+        // Campos que pertenecen al Maestro — NO se copian al registro de stock
+        const CAMPOS_MAESTRO = new Set(['relleno','dim_l','dim_di','dim_dp','unidad',
+          'almacenamiento','stock_minimo','aviso_meses','aviso_val','aviso_uni',
+          'numero_cas','uso_producto','validez_prep_val','validez_prep_uni',
+          'validez_prep_dias','validez_tit_val','validez_tit_uni','validez_tit_dias',
+          'tipo_solucion','codigo_base','descripcion_maestro']);
         // Mapeo flexible por nombre de columna (case-insensitive)
         for (const [k,v] of Object.entries(row)) {
           const key = k.toLowerCase().replace(/[^a-z0-9_]/g,'_');
-          r[key] = v;
+          if (!CAMPOS_MAESTRO.has(key)) r[key] = v;
         }
         // Buscar maestro por descripcion o codigo_erp
         const maestro = STATE.data.maestro?.articulos || [];
