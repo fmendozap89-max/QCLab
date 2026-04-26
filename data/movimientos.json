@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "edc16531-9da3-4364-b013-319864df0dc0",
+      "fecha": "2026-04-26T17:49:32.487Z",
+      "usuario": "admin",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "ca858ea4",
+      "detalle": "Editado: HCl 0.1 N (sol_volumetrica)"
+    },
+    {
       "id": "ed5a7198-385f-4324-bb9d-1fb5851d5ba0",
       "fecha": "2026-04-26T17:48:27.928Z",
       "usuario": "admin",
