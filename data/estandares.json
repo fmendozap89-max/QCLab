@@ -1,0 +1,15 @@
+{
+  "registros": [
+    {
+      "id": "11d13189-b121-43e9-9869-3fefbeb84e65",
+      "estado": "activo",
+      "maestro_id": "be1b452e",
+      "fecha_ingreso": "2026-04-26",
+      "ingresado_por": "admin",
+      "comentarios": [],
+      "categoria": "USP",
+      "lote": "L-2024-001",
+      "vencimiento": "2026-08-27"
+    }
+  ]
+}
