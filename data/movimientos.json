@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "f553184c-bfac-446a-b5b4-12400be47d68",
+      "fecha": "2026-04-26T20:31:20.576Z",
+      "usuario": "admin",
+      "tipo": "edicion",
+      "modulo": "usuarios",
+      "ref_id": "u2",
+      "detalle": "Usuario eliminado: usuario"
+    },
+    {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
       "fecha": "2026-04-26T18:29:43.273Z",
       "usuario": "admin",
@@ -91,6 +100,6 @@
       "detalle": "Apertura: cerradas 1→0, en uso 0→1 (aprobado por FM)"
     }
   ],
-  "ts_mod": "2026-04-26T20:30:59.080Z",
+  "ts_mod": "2026-04-26T20:31:20.577Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
