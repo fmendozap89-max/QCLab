@@ -571,6 +571,7 @@
         <div class="sync-dot" id="sync-dot"></div>
         <span id="sync-label">Sincronizado</span>
         <span id="sync-time" style="color:var(--text3);margin-left:4px"></span>
+        <span id="queue-badge" style="display:none;margin-left:6px;background:rgba(210,153,34,.2);color:var(--yellow);font-size:10px;padding:1px 6px;border-radius:10px;font-weight:700" title="Operaciones pendientes de envio"></span>
       </div>
     </div>
     <div id="content"></div>
@@ -791,46 +792,139 @@ function saveAllLocal() {
 }
 
 /* ════════════════════════════════════════════════════════════
-   GITHUB API
+   SINCRONIZACION — arquitectura multi-dispositivo con merge
+   ─────────────────────────────────────────────────────────
+   • Gestores con PAT: escritura directa con merge inteligente
+   • Usuarios sin PAT escritura: cola de operaciones publicada
+     en /data/cola_<deviceId>.json con PAT de cola compartido
+   • Merge por registro: nunca sobreescribe sin comparar
 ════════════════════════════════════════════════════════════ */
-async function ghRead(path) {
+
+/* ID unico y persistente de este dispositivo */
+function getDeviceId() {
+  let id = localStorage.getItem('qclab_device_id');
+  if (!id) {
+    id = 'dev_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,7);
+    localStorage.setItem('qclab_device_id', id);
+  }
+  return id;
+}
+const DEVICE_ID = getDeviceId();
+
+/* ─── MERGE INTELIGENTE por tipo de estructura ─── */
+function mergeData(key, local, remote) {
+  if (!local || !remote) return remote || local;
+
+  // Registros: merge por ID, gana el ts_mod mas reciente
+  if (local.registros && remote.registros) {
+    const map = {};
+    for (const r of remote.registros) map[r.id] = r;
+    for (const r of local.registros) {
+      const rem = map[r.id];
+      if (!rem) { map[r.id] = r; continue; }
+      const tsL = r.ts_mod || r.fecha_ingreso || '';
+      const tsR = rem.ts_mod || rem.fecha_ingreso || '';
+      if (tsL > tsR) map[r.id] = r;
+    }
+    return { ...remote, registros: Object.values(map) };
+  }
+
+  // Maestro: merge por ID de articulo
+  if (key === 'maestro' && local.articulos && remote.articulos) {
+    const map = {};
+    for (const a of remote.articulos) map[a.id] = a;
+    for (const a of local.articulos) {
+      if (!map[a.id]) { map[a.id] = a; continue; }
+      if ((a.ts_mod||'') > (map[a.id].ts_mod||'')) map[a.id] = a;
+    }
+    return { articulos: Object.values(map) };
+  }
+
+  // Movimientos: concat deduplicando por ID, ordenado por fecha
+  if (key === 'movimientos' && local.log && remote.log) {
+    const seen = new Set(remote.log.map(m => m.id));
+    const extra = local.log.filter(m => !seen.has(m.id));
+    return { log: [...remote.log, ...extra].sort((a,b) => (a.fecha||'') < (b.fecha||'') ? -1 : 1) };
+  }
+
+  // Notificaciones: merge por ID, resoluciones ganan sobre pendientes
+  if (key === 'notificaciones' && local.pendientes && remote.pendientes) {
+    const map = {};
+    for (const n of remote.pendientes) map[n.id] = n;
+    for (const n of local.pendientes) {
+      if (!map[n.id]) { map[n.id] = n; continue; }
+      if (n.estado !== 'pendiente' && map[n.id].estado === 'pendiente') map[n.id] = n;
+    }
+    return { pendientes: Object.values(map).sort((a,b) => (b.fecha||'') > (a.fecha||'') ? 1 : -1) };
+  }
+
+  // Avisos: merge por ID, oculto gana
+  if (key === 'avisos' && local.lista && remote.lista) {
+    const map = {};
+    for (const a of remote.lista) map[a.id] = a;
+    for (const a of local.lista) {
+      if (!map[a.id]) { map[a.id] = a; continue; }
+      if (a.oculto && !map[a.id].oculto) map[a.id] = a;
+    }
+    return { lista: Object.values(map).sort((a,b) => (b.fecha||'') > (a.fecha||'') ? 1 : -1) };
+  }
+
+  // Compras: merge ordenes por ID
+  if (key === 'compras' && local.ordenes && remote.ordenes) {
+    const map = {};
+    for (const o of remote.ordenes) map[o.id] = o;
+    for (const o of local.ordenes) {
+      if (!map[o.id]) { map[o.id] = o; continue; }
+      if ((o.ts_mod||o.fecha||'') > (map[o.id].ts_mod||map[o.id].fecha||'')) map[o.id] = o;
+    }
+    return { ...remote, ordenes: Object.values(map) };
+  }
+
+  // Config, usuarios: gana el ts_mod mayor
+  return (local.ts_mod||'') >= (remote.ts_mod||'') ? local : remote;
+}
+
+/* ─── GITHUB API ─── */
+async function ghRead(path, tokenOverride) {
   const { owner, repo, token } = STATE.githubCfg;
+  const useToken = tokenOverride || token;
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
   const headers = { 'Accept': 'application/vnd.github+json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (useToken) headers['Authorization'] = `Bearer ${useToken}`;
   const r = await fetch(url, { headers });
   if (r.status === 404) return null;
   if (!r.ok) throw new Error(`GitHub ${r.status}`);
   const json = await r.json();
   STATE.sha[path] = json.sha;
-  // Decodificar base64 respetando UTF-8 (atob produce Latin-1, TextDecoder corrige el encoding)
   const bytes = Uint8Array.from(atob(json.content.replace(/\n/g,'')), c => c.charCodeAt(0));
   return JSON.parse(new TextDecoder('utf-8').decode(bytes));
 }
 
-async function ghWrite(path, data, retries = 2) {
+async function ghWrite(path, data, retries = 3) {
   const { owner, repo, token } = STATE.githubCfg;
   if (!token) { saveLocal(path.replace('.json','')); return; }
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/data/${path}`;
   const body = {
-    message: `update ${path}`,
+    message: `[${DEVICE_ID.slice(0,8)}] update ${path}`,
     content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
     sha: STATE.sha[path]
   };
   const r = await fetch(url, {
     method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
-  if (r.status === 409 && retries > 0) {
-    // conflicto: re-leer y reintentar
+
+  if ((r.status === 409 || r.status === 422) && retries > 0) {
+    // Conflicto de escritura concurrente: merge inteligente y reintentar
+    console.warn(`[sync] Conflicto ${r.status} en ${path}, aplicando merge`);
     const fresh = await ghRead(path);
-    const key = path.replace('.json','');
-    if (fresh) STATE.data[key] = fresh;
-    await ghWrite(path, STATE.data[key], retries - 1);
+    const key   = path.replace('.json','');
+    if (fresh) {
+      STATE.data[key] = mergeData(key, STATE.data[key], fresh);
+      saveLocal(key);
+    }
+    await ghWrite(path, STATE.data[path.replace('.json','')], retries - 1);
     return;
   }
   if (!r.ok) { const e = await r.json(); throw new Error(e.message || r.status); }
@@ -838,51 +932,158 @@ async function ghWrite(path, data, retries = 2) {
   STATE.sha[path] = json.content.sha;
 }
 
+/* ─── COLA DE OPERACIONES (usuarios/gestores sin PAT en este dispositivo) ─── */
+const OP_QUEUE_KEY = 'qclab_op_queue';
+
+/* ─── COLA DE OPERACIONES ─── */
+/* Encola una operacion localmente para publicacion posterior */
+function encolarOperacion(op) {
+  const q = JSON.parse(localStorage.getItem(OP_QUEUE_KEY) || '[]');
+  q.push({
+    id: uuid(),
+    timestamp: new Date().toISOString(),
+    dispositivo: DEVICE_ID,
+    usuario: STATE.session?.username,
+    estado: 'pendiente',
+    ...op
+  });
+  localStorage.setItem(OP_QUEUE_KEY, JSON.stringify(q));
+  // Indicador en sync dot
+  const dot = document.getElementById('sync-dot');
+  if (dot) dot.style.background = 'var(--yellow)';
+  // Intentar publicar inmediatamente
+  publishOpQueue();
+}
+
+async function publishOpQueue() {
+  const queueToken = STATE.githubCfg?.queue_token || STATE.githubCfg?.token;
+  if (!queueToken || !STATE.githubCfg?.owner) return;
+  const q = JSON.parse(localStorage.getItem(OP_QUEUE_KEY) || '[]');
+  const pendientes = q.filter(op => op.estado === 'pendiente');
+  if (!pendientes.length) return;
+  const path = `cola_${DEVICE_ID}.json`;
+  try {
+    const remota = await ghRead(path, queueToken) || { ops: [] };
+    const opIds  = new Set(remota.ops.map(o => o.id));
+    const nuevas = pendientes.filter(o => !opIds.has(o.id));
+    if (!nuevas.length) return;
+    remota.ops = [...remota.ops, ...nuevas];
+    remota.device_id = DEVICE_ID;
+    remota.usuario   = STATE.session?.username;
+    remota.last_update = new Date().toISOString();
+    // ghWrite con el token de cola
+    const saveToken = STATE.githubCfg.token;
+    STATE.githubCfg.token = queueToken;
+    await ghWrite(path, remota);
+    STATE.githubCfg.token = saveToken;
+    nuevas.forEach(o => { const f = q.find(x=>x.id===o.id); if (f) f.estado='publicada'; });
+    localStorage.setItem(OP_QUEUE_KEY, JSON.stringify(q));
+    const pend = q.filter(o=>o.estado==='pendiente').length;
+    const dot = document.getElementById('sync-dot');
+    if (dot) dot.style.background = pend > 0 ? 'var(--yellow)' : '';
+  } catch(e) { console.warn('[queue]', e.message); }
+}
+
+/* Gestor: leer colas de todos los dispositivos y convertir en notificaciones */
+async function leerColasRemotas() {
+  if (!STATE.githubCfg?.token) return 0;
+  try {
+    const { owner, repo, token } = STATE.githubCfg;
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/data`,
+      { headers: { 'Accept': 'application/vnd.github+json', 'Authorization': `Bearer ${token}` }});
+    if (!r.ok) return 0;
+    const items = await r.json();
+    const colas = items.filter(i => i.name.startsWith('cola_') && i.name.endsWith('.json')
+                                 && !i.name.includes(DEVICE_ID));
+    let nuevas = 0;
+    for (const c of colas) {
+      try {
+        const data = await ghRead(c.name, token);
+        if (!data?.ops) continue;
+        if (!STATE.data.notificaciones) STATE.data.notificaciones = { pendientes: [] };
+        const existIds = new Set(STATE.data.notificaciones.pendientes.map(n => n.id));
+        for (const op of data.ops.filter(o => o.estado === 'pendiente')) {
+          if (!existIds.has(op.id)) {
+            STATE.data.notificaciones.pendientes.unshift({
+              id: op.id, tipo: op.tipo, modulo: op.modulo,
+              comentario: op.descripcion, solicitado_por: op.usuario,
+              dispositivo: op.dispositivo, fecha: op.timestamp,
+              estado: 'pendiente', _op_payload: op.payload
+            });
+            nuevas++;
+          }
+        }
+      } catch(e) { console.warn('[queue read]', c.name, e.message); }
+    }
+    if (nuevas) { saveLocal('notificaciones'); updateNotifBadge(); }
+    return nuevas;
+  } catch(e) { return 0; }
+}
+
+/* ─── SYNC PRINCIPAL ─── */
 async function syncFromGitHub() {
   if (!STATE.githubCfg?.owner || !STATE.githubCfg?.repo) return;
   setSyncStatus('syncing', 'Sincronizando…');
   try {
     const files = ['config','maestro','reactivos','estandares','columnas',
-                   'insumos','sol_volumetricas','sol_otras','compras','movimientos','notificaciones','avisos'];
+                   'insumos','sol_volumetricas','sol_otras','compras',
+                   'movimientos','notificaciones','avisos'];
     for (const f of files) {
-      // No sobreescribir modulos que fueron modificados localmente y aun no publicados
       if (STATE._localDirty?.[f]) continue;
-      const d = await ghRead(f + '.json');
-      if (d) { STATE.data[f] = d; saveLocal(f); }
+      try {
+        const remote = await ghRead(f + '.json');
+        if (!remote) continue;
+        STATE.data[f] = mergeData(f, STATE.data[f], remote);
+        saveLocal(f);
+      } catch(e) { console.warn('[sync]', f, e.message); }
     }
-    setSyncStatus('ok', 'Sincronizado');
+    // Gestor: procesar colas de dispositivos remotos
+    if (isGestor() && STATE.githubCfg?.token) await leerColasRemotas();
+    // Re-intentar publicar cola propia
+    publishOpQueue();
+    setSyncStatus('ok', `Sync ${new Date().toLocaleTimeString('es-UY',{hour:'2-digit',minute:'2-digit'})}`);
     updateNotifBadge();
     updateAvisosBadge();
     if (STATE.page) renderPage(STATE.page);
   } catch(e) {
     setSyncStatus('error', 'Error sync');
-    console.error(e);
+    console.error('[sync]', e);
   }
 }
 
 async function pushToGitHub(key) {
   if (!STATE.githubCfg?.token) { saveLocal(key); return; }
   setSyncStatus('syncing', 'Guardando…');
+  if (STATE.data[key] && typeof STATE.data[key] === 'object') {
+    STATE.data[key].ts_mod = new Date().toISOString();
+    STATE.data[key].device_mod = DEVICE_ID;
+  }
   try {
     await ghWrite(key + '.json', STATE.data[key]);
-    // Limpiar dirty flag — el dato ya esta en GitHub
     if (STATE._localDirty) delete STATE._localDirty[key];
     setSyncStatus('ok', 'Guardado');
   } catch(e) {
-    toast('Error al guardar en GitHub: ' + e.message, 'error');
+    toast('Error al guardar: ' + e.message, 'error');
     setSyncStatus('error', 'Error');
     saveLocal(key);
   }
 }
-
 function setSyncStatus(s, label) {
   const dot = document.getElementById('sync-dot');
   const lbl = document.getElementById('sync-label');
   const tm  = document.getElementById('sync-time');
+  const qb  = document.getElementById('queue-badge');
   if (!dot) return;
   dot.className = 'sync-dot' + (s === 'syncing' ? ' syncing' : s === 'error' ? ' error' : '');
   lbl.textContent = label;
   if (s === 'ok') tm.textContent = new Date().toLocaleTimeString('es-UY',{hour:'2-digit',minute:'2-digit'});
+  // Mostrar badge de cola pendiente
+  if (qb) {
+    const q = JSON.parse(localStorage.getItem(OP_QUEUE_KEY) || '[]');
+    const pend = q.filter(o => o.estado === 'pendiente').length;
+    qb.textContent = pend + ' pendiente' + (pend !== 1 ? 's' : '');
+    qb.style.display = pend > 0 ? '' : 'none';
+  }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1033,15 +1234,18 @@ async function resolverNotificacion(id, decision) {
   if (decision === 'aprobada' && n.tipo === 'alta_maestro') {
     // ya fue agregado al maestro por el gestor; solo confirmar
   }
-  if (decision === 'aprobada' && n.tipo === 'consumo_propuesto' && n.propuesta_consumo) {
+  if (decision === 'aprobada' && n.tipo === 'consumo_propuesto') {
+    // Propuesta puede venir de crearNotificacion local (propuesta_consumo)
+    // o de una cola remota (_op_payload)
+    const propuesta = n.propuesta_consumo || n._op_payload;
     const reg = (STATE.data[n.modulo]?.registros||[]).find(r=>r.id===n.ref_id);
-    if (reg) {
-      const p = n.propuesta_consumo;
-      const resultado = aplicarEventoConsumo(reg, p.tipo, p.cantidad);
+    if (reg && propuesta) {
+      const resultado = aplicarEventoConsumo(reg, propuesta.tipo, propuesta.cantidad);
       if (resultado.ok) {
+        reg.ts_mod = new Date().toISOString();
         if (!reg.consumos) reg.consumos = [];
-        reg.consumos.push({ id:uuid(), fecha:new Date().toISOString(), tipo:p.tipo,
-          cantidad:p.cantidad, usuario:n.solicitado_por, obs:p.obs,
+        reg.consumos.push({ id:uuid(), fecha:new Date().toISOString(), tipo:propuesta.tipo,
+          cantidad:propuesta.cantidad, usuario:n.solicitado_por, obs:propuesta.obs,
           aprobado_por:STATE.session?.username });
         const art = getMaestroArt(reg.maestro_id);
         const min = art?.stock_minimo || 0;
@@ -2438,6 +2642,7 @@ async function saveNew(modulo) {
   const reg = {
     id: uuid(), estado: 'activo', maestro_id: mid,
     fecha_ingreso: today(), ingresado_por: STATE.session?.username,
+    ts_mod: new Date().toISOString(),
     comentarios: []
   };
 
@@ -2853,6 +3058,7 @@ async function saveConsumo(modulo, id) {
     const cantidadDirecto = tipo === 'directo' ? (Number(gv('consumo-cantidad')) || 0) : 1;
     const resultado = aplicarEventoConsumo(r, tipo, cantidadDirecto);
     if (!resultado.ok) return;
+    r.ts_mod = new Date().toISOString();
     const detalle = resultado.detalle + (obs ? ` | ${obs}` : '');
     if (!r.consumos) r.consumos = [];
     r.consumos.push({ id:uuid(), fecha:ahora, tipo, cantidad:cantidadDirecto, usuario:STATE.session?.username, obs });
@@ -2874,16 +3080,30 @@ async function saveConsumo(modulo, id) {
     const cantidadDirecto = tipo === 'directo' ? (Number(gv('consumo-cantidad')) || 0) : 1;
     if (tipo === 'directo' && cantidadDirecto <= 0) { toast('Indique la cantidad a consumir', 'error'); return; }
     const propuesta = { tipo, cantidad: cantidadDirecto, obs };
-    crearNotificacion('consumo_propuesto', modulo, id,
+    const notifId = crearNotificacion('consumo_propuesto', modulo, id,
       `Propuesta consumo: ${tipo}${tipo==='directo'?' ('+cantidadDirecto+' ud.)':''} — ${art?.descripcion||id}${obs?' | '+obs:''}`,
       STATE.session?.username
     );
-    // Guardar datos de la propuesta en la notificacion para que el Gestor pueda ejecutarla
-    const notifs = STATE.data.notificaciones?.pendientes || [];
-    if (notifs[0]) notifs[0].propuesta_consumo = propuesta;
-    await pushToGitHub('notificaciones');
-    closeModal();
-    toast('Propuesta de consumo enviada al Gestor para aprobacion', 'warning');
+    // Adjuntar payload para ejecucion al aprobar
+    const notifs2 = STATE.data.notificaciones?.pendientes || [];
+    const notif2 = notifs2.find(n => n.id === notifId);
+    if (notif2) notif2.propuesta_consumo = propuesta;
+    const tieneToken = STATE.githubCfg?.queue_token || STATE.githubCfg?.token;
+    if (tieneToken) {
+      // Encolar en GitHub para que el Gestor la vea desde cualquier dispositivo
+      encolarOperacion({
+        tipo: 'consumo_propuesto', modulo, ref_id: id,
+        descripcion: `Propuesta consumo: ${tipo}${tipo==='directo'?' ('+cantidadDirecto+' ud.)':''}${obs?' | '+obs:''} — ${art?.descripcion||id}`,
+        payload: propuesta, usuario: STATE.session?.username
+      });
+      await pushToGitHub('notificaciones');
+      closeModal();
+      toast('Propuesta enviada al Gestor', 'warning');
+    } else {
+      saveLocal('notificaciones');
+      closeModal();
+      toast('Propuesta guardada localmente. Sin Token de Cola, el Gestor debera sincronizar desde este dispositivo.', 'warning');
+    }
   }
 }
 
@@ -4281,44 +4501,55 @@ function renderConfig() {
     <div class="card">
       <div class="card-header"><span class="card-title">Sincronizacion GitHub</span></div>
       <p style="font-size:11px;color:var(--text2);margin-bottom:12px">
-        El repositorio GitHub actua como base de datos compartida. El Gestor configura el repositorio y publica los datos.
-        Los demas usuarios solo necesitan el nombre del repositorio para leer los datos — no requieren PAT.
+        El repositorio GitHub actua como base de datos compartida con merge inteligente por registro.
+        Multiples gestores pueden operar en simultáneo sin perder datos.
       </p>
       <div class="form-grid">
         <div class="form-group"><label>Usuario/Org de GitHub</label>
           <input type="text" id="cfg-gh-owner" value="${esc(gh.owner||'')}" placeholder="nombre-usuario-github"></div>
         <div class="form-group"><label>Nombre del repositorio</label>
           <input type="text" id="cfg-gh-repo" value="${esc(gh.repo||'')}" placeholder="qclab-data"></div>
-        <div class="form-group"><label>Token (PAT) — solo Gestor</label>
+        <div class="form-group"><label>Token (PAT) — lectura y escritura</label>
           <input type="password" id="cfg-gh-token" value="${esc(gh.token||'')}" placeholder="ghp_...">
-          <span class="form-hint">Necesario para escribir datos. Los usuarios lectores dejan este campo vacio.</span></div>
+          <span class="form-hint">Requerido para guardar cambios. Scopes necesarios: <code>repo</code></span></div>
+        <div class="form-group"><label>Token de Cola — solo escritura de colas (opcional)</label>
+          <input type="password" id="cfg-gh-queue-token" value="${esc(gh.queue_token||'')}" placeholder="ghp_...">
+          <span class="form-hint">PAT con acceso restringido a <code>cola_*.json</code>. Se distribuye a usuarios para que puedan enviar propuestas sin acceso a datos criticos.</span></div>
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="saveGHConfig()">Guardar y Sincronizar</button>
         <button class="btn btn-secondary" onclick="forceSyncFromRemote()">⬇ Forzar descarga remota</button>
-        ${gh.token ? `<button class="btn btn-secondary" onclick="publicarTodoAGitHub()">⬆ Publicar todos los datos en GitHub</button>` : ''}
+        ${gh.token ? `<button class="btn btn-secondary" onclick="publicarTodoAGitHub()">⬆ Publicar todos los datos</button>` : ''}
       </div>
-      <p style="font-size:10.5px;color:var(--text3);margin-top:8px">
-        ⚠ "Forzar descarga" sobreescribe los datos locales con el estado de GitHub.
-        "Publicar todo" sube todos los modulos locales a GitHub — usar cuando se cargaron datos locales que aun no estan en el repositorio.
-      </p>
+      <div style="margin-top:10px;font-size:10.5px;color:var(--text3)">
+        ID de este dispositivo: <span class="col-mono">${getDeviceId()}</span>
+      </div>
     </div>
 
     <div class="card">
-      <div class="card-header"><span class="card-title">🔗 Configuracion para otros dispositivos / usuarios</span></div>
-      <p style="font-size:11px;color:var(--text2);margin-bottom:10px">
-        Para que otros analistas accedan a la misma base de datos, deben configurar solo el repositorio (sin PAT).
-        Comparta estos datos con su equipo:
-      </p>
+      <div class="card-header"><span class="card-title">🔗 Datos de conexion para otros dispositivos</span></div>
       ${gh.owner && gh.repo ? `
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;font-size:12px;font-family:var(--font-mono)">
-        <div style="margin-bottom:4px">Usuario/Org: <strong>${esc(gh.owner)}</strong></div>
-        <div>Repositorio: <strong>${esc(gh.repo)}</strong></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:var(--bg3);border:1px solid rgba(139,92,246,.3);border-radius:var(--r);padding:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px">👑 GESTOR (lectura + escritura)</div>
+          <div style="font-size:11px;margin-bottom:4px">Repositorio: <span class="col-mono">${esc(gh.owner)}/${esc(gh.repo)}</span></div>
+          <div style="font-size:11px;margin-bottom:6px">Token PAT: con scope <code>repo</code></div>
+          <div style="font-size:10px;color:var(--text3)">Cada Gestor configura su propio PAT en su dispositivo. El PAT no se comparte.</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid rgba(47,129,247,.3);border-radius:var(--r);padding:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px">👤 ANALISTA (propuestas)</div>
+          <div style="font-size:11px;margin-bottom:4px">Repositorio: <span class="col-mono">${esc(gh.owner)}/${esc(gh.repo)}</span></div>
+          <div style="font-size:11px;margin-bottom:6px">Token de Cola: <span class="col-mono">${gh.queue_token ? '✔ configurado' : '⚠ no configurado'}</span></div>
+          <div style="font-size:10px;color:var(--text3)">Sin token de cola los analistas solo pueden leer — no pueden enviar propuestas de consumo.</div>
+        </div>
       </div>
-      <p style="font-size:10.5px;color:var(--text3);margin-top:8px">
-        Los analistas ingresan estos datos en Configuracion → GitHub al abrir la app por primera vez.
-        No compartir el PAT — ese es exclusivo del Gestor.
-      </p>` : `<div class="empty-state" style="padding:12px">Configure el repositorio primero para ver los datos de conexion.</div>`}
+      <div style="margin-top:10px;padding:10px;background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.2);border-radius:var(--r);font-size:11px">
+        <strong>Configuracion rapida para analistas:</strong><br>
+        1. Abrir <code>${location.href.split('#')[0]}</code> en el dispositivo<br>
+        2. Ir a Configuracion → Sincronizacion GitHub<br>
+        3. Ingresar: <strong>Repositorio:</strong> <span class="col-mono">${esc(gh.owner)}/${esc(gh.repo)}</span>
+           ${gh.queue_token ? `<br>4. Ingresar: <strong>Token de Cola</strong> (solicitar al Gestor)` : ''}
+      </div>` : `<div class="empty-state" style="padding:12px">Configure el repositorio primero.</div>`}
     </div>
 
     <div class="card">
@@ -4778,14 +5009,20 @@ async function doResetPass(id) {
 }
 
 async function saveGHConfig() {
-  const cfg = { owner: gv('cfg-gh-owner'), repo: gv('cfg-gh-repo'), token: gv('cfg-gh-token') };
+  const cfg = {
+    owner:       gv('cfg-gh-owner'),
+    repo:        gv('cfg-gh-repo'),
+    token:       gv('cfg-gh-token'),
+    queue_token: gv('cfg-gh-queue-token') || undefined
+  };
   if (!cfg.owner || !cfg.repo) { toast('Ingrese usuario y repositorio', 'error'); return; }
+  if (!cfg.queue_token) delete cfg.queue_token;
   STATE.githubCfg = cfg;
   localStorage.setItem('qclab_gh', JSON.stringify(cfg));
   if (STATE.syncInterval) clearInterval(STATE.syncInterval);
   STATE.syncInterval = setInterval(syncFromGitHub, 60000);
   await syncFromGitHub();
-  renderPage(STATE.page); // refrescar para mostrar card de datos de conexion
+  renderPage(STATE.page);
   toast('Configuracion GitHub guardada y sincronizado','success');
 }
 
