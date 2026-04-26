@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "7c16527a-b435-436c-ba9a-968671f62149",
+      "fecha": "2026-04-26T16:29:09.650Z",
+      "usuario": "admin",
+      "tipo": "edicion",
+      "modulo": "reactivos",
+      "ref_id": "85c250d0-d175-462c-9039-23c4c412b5df",
+      "detalle": "Registro editado por admin"
+    },
+    {
       "id": "22ec5b7c-cf3d-457b-b49d-9613ef794b72",
       "fecha": "2026-04-26T16:25:52.239Z",
       "usuario": "admin",
