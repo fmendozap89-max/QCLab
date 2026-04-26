@@ -30,6 +30,14 @@
           "valor": 0.1015,
           "usuario": "admin",
           "analista": "admin"
+        },
+        {
+          "id": "315a4389-b290-49ba-ad35-6808a84dd1cc",
+          "fecha_titulo": "2026-05-27",
+          "vencimiento_titulo": "2026-06-26",
+          "valor": 0.1002,
+          "usuario": "admin",
+          "analista": "admin"
         }
       ]
     }
