@@ -21,9 +21,18 @@
       "categoria": "USP",
       "lote": "a",
       "cantidad_ingreso": 3,
-      "uds_cerradas": 3,
+      "uds_cerradas": 2,
       "uds_en_uso": 0,
-      "consumos": [],
+      "consumos": [
+        {
+          "id": "0d56866e-d2c3-486f-8f8c-0021f48bf969",
+          "fecha": "2026-04-26T17:09:55.150Z",
+          "tipo": "directo",
+          "cantidad": 1,
+          "usuario": "admin",
+          "obs": "ensayo L23365"
+        }
+      ],
       "vencimiento": "2026-08-25"
     }
   ]
