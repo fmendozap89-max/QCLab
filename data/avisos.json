@@ -1,3 +1,15 @@
 {
-  "lista": []
+  "lista": [
+    {
+      "id": "fd0e9090-abd4-4a3c-933a-7c98e12cdba3",
+      "tipo": "bajo_stock",
+      "modulo": "reactivos",
+      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "detalle": "Bajo stock: Ácido clorhídrico 37% ACS — cerradas: 1/2 x 2.5L",
+      "fecha": "2026-04-26T18:39:41.235Z",
+      "oculto": false,
+      "ocultado_por": null,
+      "fecha_ocultado": null
+    }
+  ]
 }
