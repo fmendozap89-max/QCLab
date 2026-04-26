@@ -10,8 +10,8 @@
       "codigo_rc": "RC26001",
       "lote": "ABC123",
       "cantidad_total": 4,
-      "cantidad_en_uso": 0,
-      "cantidad_cerradas": 0,
+      "cantidad_en_uso": 1,
+      "cantidad_cerradas": 3,
       "vencimiento": "2026-05-30",
       "almacenamiento": "Freezer",
       "aviso_meses": 3
