@@ -48,8 +48,15 @@
       "hash": "1uyt01",
       "display": "VR",
       "role": "usuario"
+    },
+    {
+      "id": "41ae1620-fca4-41eb-b7d2-d0b0f5ed38d2",
+      "username": "PlantaB",
+      "hash": "1rdtnf",
+      "display": "PlantaB",
+      "role": "usuario"
     }
   ],
-  "ts_mod": "2026-04-26T20:48:54.590Z",
+  "ts_mod": "2026-04-26T20:49:21.995Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
