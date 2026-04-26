@@ -156,14 +156,14 @@
       "descripcion": "CafeÃÂÃÂ­na USP RS",
       "codigo_erp": "EST-001",
       "activo": true,
-      "unidad": "mg",
-      "almacenamiento": "Refrigerador",
-      "stock_minimo": 200,
+      "unidad": "Vial x 500mg",
+      "almacenamiento": "Freezer",
+      "stock_minimo": 2,
       "aviso_val": 6,
       "aviso_uni": "meses",
       "aviso_meses": 6,
       "uso_producto": "CafeÃÂÃÂ­na comprimidos",
-      "observaciones": ""
+      "observaciones": null
     },
     {
       "id": "be1b452e",
