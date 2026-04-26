@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "d6be989a-e7ce-46ad-9c87-6460bb30316f",
+      "fecha": "2026-04-26T17:09:22.335Z",
+      "usuario": "admin",
+      "tipo": "ingreso",
+      "modulo": "estandares",
+      "ref_id": "3f861d4d-35c9-4865-9552-75b0a940d508",
+      "detalle": "Ingreso: CafeÃÂÃÂ­na USP RS "
+    },
+    {
       "id": "8eb5f53d-190e-4943-9d40-8793f7322a09",
       "fecha": "2026-04-26T17:09:00.315Z",
       "usuario": "admin",
