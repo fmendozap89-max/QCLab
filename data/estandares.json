@@ -1,3 +1,19 @@
 {
-  "registros": []
+  "registros": [
+    {
+      "id": "89287c57-7227-4992-aacb-73ede7d7f669",
+      "estado": "activo",
+      "maestro_id": "37c7fbf8",
+      "fecha_ingreso": "2026-04-26",
+      "ingresado_por": "admin",
+      "comentarios": [],
+      "categoria": "USP",
+      "lote": "Cafe1",
+      "cantidad_ingreso": 5,
+      "uds_cerradas": 5,
+      "uds_en_uso": 0,
+      "consumos": [],
+      "vencimiento": "2026-10-28"
+    }
+  ]
 }
