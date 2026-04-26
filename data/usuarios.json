@@ -3,7 +3,7 @@
     {
       "id": "u1",
       "username": "admin",
-      "hash": "-g10hvh",
+      "hash": "-eqjx0q",
       "display": "Administrador",
       "role": "gestor"
     },
@@ -20,15 +20,8 @@
       "hash": "-eqjx0q",
       "display": "FM",
       "role": "gestor"
-    },
-    {
-      "id": "acc926e9-9fd8-493c-a247-cc059a37112d",
-      "username": "CS",
-      "hash": "1kjcpp",
-      "display": "CS",
-      "role": "gestor"
     }
   ],
-  "ts_mod": "2026-04-26T20:06:02.922Z",
+  "ts_mod": "2026-04-26T20:30:33.957Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
