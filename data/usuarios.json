@@ -1,0 +1,20 @@
+{
+  "lista": [
+    {
+      "id": "u1",
+      "username": "admin",
+      "hash": "-g10hvh",
+      "display": "Administrador",
+      "role": "gestor"
+    },
+    {
+      "id": "u2",
+      "username": "usuario",
+      "hash": "-vn16t8",
+      "display": "Analista",
+      "role": "usuario"
+    }
+  ],
+  "ts_mod": "2026-04-26T19:50:22.573Z",
+  "device_mod": "dev_mog660xx_bgjlw"
+}
