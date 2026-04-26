@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "9eb52ce9-698d-416e-9b70-d6ec887d9aa2",
+      "fecha": "2026-04-26T18:38:32.556Z",
+      "usuario": "admin",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "b268af55",
+      "detalle": "Editado: Ácido clorhídrico 37% ACS (reactivo)"
+    },
+    {
       "id": "8d0f8c1b-74ee-4742-a261-5ada02a71bae",
       "fecha": "2026-04-26T18:38:05.299Z",
       "usuario": "admin",
