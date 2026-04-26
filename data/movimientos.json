@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "b3e70d20-7518-453f-b789-b836e91b7c7b",
+      "fecha": "2026-04-26T17:42:11.606Z",
+      "usuario": "admin",
+      "tipo": "edicion",
+      "modulo": "sol_volumetricas",
+      "ref_id": "f794d158-64f3-4729-91f0-89f82081ce2b",
+      "detalle": "Edicion de registro"
+    },
+    {
       "id": "d58f9dc8-3f62-4c0b-8422-1417e83e7dcb",
       "fecha": "2026-04-26T17:42:01.685Z",
       "usuario": "admin",
