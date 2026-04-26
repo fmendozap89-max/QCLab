@@ -52,6 +52,18 @@
       "fecha_prep": "2026-04-27",
       "vencimiento": "2027-04-27",
       "titulos": []
+    },
+    {
+      "id": "c84de9f0-97ba-47cc-a674-6241fa4081f5",
+      "estado": "en_uso",
+      "maestro_id": "7a32231c",
+      "fecha_ingreso": "2026-04-26",
+      "ingresado_por": "admin",
+      "comentarios": [],
+      "codigo": "SVH-C17",
+      "fecha_prep": "2026-04-26",
+      "vencimiento": "2027-04-26",
+      "titulos": []
     }
   ]
 }
