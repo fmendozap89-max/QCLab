@@ -3708,29 +3708,72 @@ function openOCModal(ocId) {
   openModal(ocId ? 'Editar OC' : 'Nueva Orden de Compra', `
     <div class="form-grid">
       <div class="form-group"><label>N° OC</label><input type="text" id="oc-numero" value="${esc(oc?.numero_oc||'')}"></div>
-      <div class="form-group"><label>Tipo Artículo<span class="req">*</span></label>
-        <select id="oc-tipo">${tipos.map(t=>`<option ${oc?.tipo_articulo===t?'selected':''}>${t}</option>`).join('')}</select></div>
-      <div class="form-group span2"><label>Artículo (Maestro)</label>
-        <select id="oc-maestro"><option value="">Seleccione…</option>${maestroOptions()}</select></div>
-      <div class="form-group span2"><label>Descripción libre</label>
+      <div class="form-group"><label>Tipo Articulo<span class="req">*</span></label>
+        <select id="oc-tipo" onchange="ocFiltrarMaestro()">${tipos.map(t=>`<option ${oc?.tipo_articulo===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="form-group span2"><label>Articulo (Maestro)</label>
+        <select id="oc-maestro" onchange="ocRellenarERP()"><option value="">Seleccione…</option>${maestroOptions()}</select></div>
+      <div class="form-group span2"><label>Descripcion libre</label>
         <input type="text" id="oc-desc" value="${esc(oc?.descripcion_libre||'')}"></div>
-      <div class="form-group"><label>Código ERP</label>
-        <input type="text" id="oc-erp" value="${esc(oc?.codigo_erp||'')}"></div>
+      <div class="form-group"><label>Codigo ERP</label>
+        <input type="text" id="oc-erp" value="${esc(oc?.codigo_erp||'')}">
+        <span class="form-hint">Se completa automaticamente al seleccionar articulo del Maestro</span></div>
       <div class="form-group"><label>F. Solicitud</label>
         <input type="date" id="oc-fsol" value="${oc?.fecha_solicitud||today()}"></div>
       <div class="form-group"><label>F. Entrega Est.</label>
         <input type="date" id="oc-fent" value="${oc?.fecha_entrega_estimada||''}"></div>
-      <div class="form-group"><label>F. Recepción</label>
+      <div class="form-group"><label>F. Recepcion</label>
         <input type="date" id="oc-frec" value="${oc?.fecha_recepcion||''}"></div>
       <div class="form-group"><label>Estado</label>
         <select id="oc-estado">${estadosOC.map(e=>`<option ${oc?.estado===e?'selected':''}>${e}</option>`).join('')}</select></div>
     </div>
   `,`<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
      <button class="btn btn-primary" onclick="saveOC('${ocId||''}')">Guardar</button>`);
-  if (oc?.maestro_id) setTimeout(()=>{ const s=document.getElementById('oc-maestro'); if(s)s.value=oc.maestro_id; },50);
+  // Pre-rellenar artículo y ERP si es edición
+  if (oc?.maestro_id) setTimeout(()=>{
+    ocFiltrarMaestro();
+    const s = document.getElementById('oc-maestro');
+    if (s) { s.value = oc.maestro_id; ocRellenarERP(); }
+  }, 60);
+  else setTimeout(() => ocFiltrarMaestro(), 60);
 }
 
 function editOC(id) { openOCModal(id); }
+
+/* Filtra el select oc-maestro para mostrar solo artículos del tipo seleccionado */
+function ocFiltrarMaestro() {
+  const tipo = document.getElementById('oc-tipo')?.value || '';
+  const sel  = document.getElementById('oc-maestro');
+  if (!sel) return;
+  const arts = STATE.data.maestro?.articulos || [];
+  // Mapeo tipo OC → tipo Maestro
+  const tipoMap = {
+    reactivo: ['reactivo'], estandar: ['estandar'], columna: ['columna'],
+    insumo: ['insumo'], solucion: ['sol_volumetrica','sol_otra'], otro: []
+  };
+  const filtros = tipoMap[tipo] || [];
+  const filtrados = filtros.length
+    ? arts.filter(a => filtros.includes(a.tipo) && a.activo !== false)
+    : arts.filter(a => a.activo !== false);
+  const currVal = sel.value;
+  sel.innerHTML = '<option value="">Seleccione…</option>' +
+    filtrados.map(a => `<option value="${a.id}"${a.id===currVal?' selected':''}>${esc(a.descripcion)}${a.codigo_erp?' ('+a.codigo_erp+')':a.codigo_base?' ('+a.codigo_base+')':''}</option>`).join('');
+  // Si el valor actual ya no está en la lista, limpiar ERP
+  if (currVal && !filtrados.find(a => a.id === currVal)) {
+    sel.value = '';
+    const erpEl = document.getElementById('oc-erp');
+    if (erpEl) erpEl.value = '';
+  }
+}
+
+/* Completa Código ERP con el dato del Maestro al seleccionar un artículo */
+function ocRellenarERP() {
+  const mid  = document.getElementById('oc-maestro')?.value;
+  const erpEl = document.getElementById('oc-erp');
+  if (!erpEl) return;
+  if (!mid) { erpEl.value = ''; return; }
+  const art = getMaestroArt(mid);
+  if (art) erpEl.value = art.codigo_erp || art.codigo_base || '';
+}
 
 async function saveOC(existingId) {
   const ord = {
@@ -5176,8 +5219,19 @@ function renderUsuariosConfig() {
 
 async function eliminarUsuario(id, username) {
   if (id === STATE.session?.id) { toast('No puede eliminarse a si mismo', 'error'); return; }
+  const users = STATE.data.usuarios?.lista || [];
+  const target = users.find(u => u.id === id);
+  // Verificar que no sea el ultimo gestor
+  if (target?.role === 'gestor') {
+    const otrosGestores = users.filter(u => u.role === 'gestor' && u.id !== id);
+    if (otrosGestores.length === 0) {
+      toast('No se puede eliminar el ultimo Gestor del sistema', 'error'); return;
+    }
+  }
   openModal('Confirmar eliminacion',
-    `<p style="font-size:12px">¿Eliminar el usuario <strong>${esc(username)}</strong>? Esta accion no se puede deshacer.</p>`,
+    `<p style="font-size:12px">¿Eliminar el usuario <strong>${esc(username)}</strong>
+    ${target?.role === 'gestor' ? '<span class="badge badge-purple" style="margin-left:4px">Gestor</span>' : ''}?
+    Esta accion no se puede deshacer.</p>`,
     `<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
      <button class="btn btn-danger" onclick="closeModal();_doEliminarUsuario('${id}','${esc(username)}')">Eliminar</button>`
   );
