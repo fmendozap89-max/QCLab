@@ -10,9 +10,18 @@
       "codigo_rc": "RC26001",
       "lote": "HCL1",
       "cantidad_ingreso": 6,
-      "uds_cerradas": 6,
+      "uds_cerradas": 5,
       "uds_en_uso": 0,
-      "consumos": [],
+      "consumos": [
+        {
+          "id": "61061ffd-fd1c-497d-b26b-41428c2e3434",
+          "fecha": "2026-04-26T18:38:54.658Z",
+          "tipo": "directo",
+          "cantidad": 1,
+          "usuario": "admin",
+          "obs": "ok1"
+        }
+      ],
       "vencimiento": "2026-10-27"
     }
   ]
