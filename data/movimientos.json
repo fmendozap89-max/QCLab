@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "8c47fe39-eaa8-45ca-a23f-e64d36000b97",
+      "fecha": "2026-04-26T17:41:59.933Z",
+      "usuario": "admin",
+      "tipo": "baja",
+      "modulo": "sol_volumetricas",
+      "ref_id": "f86fc3b6-0226-4162-8927-17d61ee6a04d",
+      "detalle": "Baja directa por gestor. Motivo: pp"
+    },
+    {
       "id": "03934817-4bf4-4323-8810-43ab2148b94a",
       "fecha": "2026-04-26T17:41:47.437Z",
       "usuario": "admin",
