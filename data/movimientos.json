@@ -1,15 +1,6 @@
 {
   "log": [
     {
-      "id": "71ddce3d-e127-44d0-8637-4849a64721ba",
-      "fecha": "2026-04-26T19:32:15.309Z",
-      "usuario": "admin",
-      "tipo": "ingreso",
-      "modulo": "columnas",
-      "ref_id": "72e2fc2b-785e-420c-844a-f741efaebf71",
-      "detalle": "Ingreso: Kinetex C18 150×4.6 2"
-    },
-    {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
       "fecha": "2026-04-26T18:29:43.273Z",
       "usuario": "admin",
@@ -80,8 +71,17 @@
       "modulo": "estandares",
       "ref_id": "89287c57-7227-4992-aacb-73ede7d7f669",
       "detalle": "Ingreso: Cafeína USP RS "
+    },
+    {
+      "id": "71ddce3d-e127-44d0-8637-4849a64721ba",
+      "fecha": "2026-04-26T19:32:15.309Z",
+      "usuario": "admin",
+      "tipo": "ingreso",
+      "modulo": "columnas",
+      "ref_id": "72e2fc2b-785e-420c-844a-f741efaebf71",
+      "detalle": "Ingreso: Kinetex C18 150×4.6 2"
     }
   ],
-  "ts_mod": "2026-04-26T19:32:16.412Z",
-  "device_mod": "dev_mog5yptz_wemrz"
+  "ts_mod": "2026-04-26T19:50:20.731Z",
+  "device_mod": "dev_mog660xx_bgjlw"
 }
