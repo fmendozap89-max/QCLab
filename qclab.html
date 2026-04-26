@@ -333,7 +333,7 @@
   .login-box {
     background: var(--bg2); border: 1px solid var(--border);
     border-radius: var(--r2); padding: 32px;
-    width: 340px; box-shadow: var(--shadow2);
+    width: 400px; max-width: 96vw; box-shadow: var(--shadow2);
   }
   .login-logo {
     display: flex; align-items: center; gap: 10px;
@@ -472,6 +472,42 @@
       <div class="logo-icon">Q</div>
       <div><div class="logo-text">QC Lab Stock</div><div class="logo-sub">Gestión de Laboratorio</div></div>
     </div>
+
+    <!-- Panel de sincronización — visible antes de autenticarse -->
+    <div id="login-sync-panel" style="margin-bottom:20px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+      <button onclick="toggleLoginSync()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border:none;color:var(--text);cursor:pointer;font-size:12px;font-weight:600">
+        <span>⚙️ Configurar sincronización GitHub</span>
+        <span id="login-sync-arrow" style="font-size:10px;color:var(--text2)">▼</span>
+      </button>
+      <div id="login-sync-body" style="display:none;padding:14px;border-top:1px solid var(--border)">
+        <div id="login-sync-status" style="font-size:11px;margin-bottom:10px;padding:7px 10px;border-radius:var(--r);display:none"></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="form-group">
+            <label>Usuario/Org de GitHub</label>
+            <input type="text" id="ls-owner" placeholder="nombre-usuario-github"
+              value="${localStorage.getItem('qclab_gh') ? JSON.parse(localStorage.getItem('qclab_gh')).owner||'' : ''}">
+          </div>
+          <div class="form-group">
+            <label>Repositorio</label>
+            <input type="text" id="ls-repo" placeholder="qclab-data"
+              value="${localStorage.getItem('qclab_gh') ? JSON.parse(localStorage.getItem('qclab_gh')).repo||'' : ''}">
+          </div>
+          <div class="form-group">
+            <label>Token (PAT)</label>
+            <input type="password" id="ls-token" placeholder="ghp_..."
+              value="${localStorage.getItem('qclab_gh') ? JSON.parse(localStorage.getItem('qclab_gh')).token||'' : ''}">
+          </div>
+          <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="loginSyncGuardar()">
+            Guardar y sincronizar
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Estado de sync compacto cuando está configurado -->
+    <div id="login-sync-ok" style="display:none;margin-bottom:14px;font-size:11px;color:var(--green);padding:7px 10px;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.2);border-radius:var(--r)">
+      ✔ Conectado a GitHub — usuarios sincronizados
+    </div>
+
     <div class="login-title">Iniciar Sesión</div>
     <div class="login-sub">Ingrese sus credenciales para continuar</div>
     <div class="form-group" style="margin-bottom:10px">
@@ -956,31 +992,24 @@ function encolarOperacion(op) {
 }
 
 async function publishOpQueue() {
-  const queueToken = STATE.githubCfg?.queue_token || STATE.githubCfg?.token;
-  if (!queueToken || !STATE.githubCfg?.owner) return;
+  if (!STATE.githubCfg?.token || !STATE.githubCfg?.owner) return;
   const q = JSON.parse(localStorage.getItem(OP_QUEUE_KEY) || '[]');
   const pendientes = q.filter(op => op.estado === 'pendiente');
   if (!pendientes.length) return;
   const path = `cola_${DEVICE_ID}.json`;
   try {
-    const remota = await ghRead(path, queueToken) || { ops: [] };
+    const remota = await ghRead(path) || { ops: [] };
     const opIds  = new Set(remota.ops.map(o => o.id));
     const nuevas = pendientes.filter(o => !opIds.has(o.id));
     if (!nuevas.length) return;
     remota.ops = [...remota.ops, ...nuevas];
-    remota.device_id = DEVICE_ID;
-    remota.usuario   = STATE.session?.username;
+    remota.device_id  = DEVICE_ID;
+    remota.usuario    = STATE.session?.username;
     remota.last_update = new Date().toISOString();
-    // ghWrite con el token de cola
-    const saveToken = STATE.githubCfg.token;
-    STATE.githubCfg.token = queueToken;
     await ghWrite(path, remota);
-    STATE.githubCfg.token = saveToken;
     nuevas.forEach(o => { const f = q.find(x=>x.id===o.id); if (f) f.estado='publicada'; });
     localStorage.setItem(OP_QUEUE_KEY, JSON.stringify(q));
-    const pend = q.filter(o=>o.estado==='pendiente').length;
-    const dot = document.getElementById('sync-dot');
-    if (dot) dot.style.background = pend > 0 ? 'var(--yellow)' : '';
+    setSyncStatus('ok', 'Sincronizado');
   } catch(e) { console.warn('[queue]', e.message); }
 }
 
@@ -1089,6 +1118,66 @@ function setSyncStatus(s, label) {
 /* ════════════════════════════════════════════════════════════
    AUTH
 ════════════════════════════════════════════════════════════ */
+function toggleLoginSync() {
+  const body  = document.getElementById('login-sync-body');
+  const arrow = document.getElementById('login-sync-arrow');
+  const open  = body.style.display !== 'none';
+  body.style.display  = open ? 'none' : 'block';
+  arrow.textContent   = open ? '▼' : '▲';
+}
+
+async function loginSyncGuardar() {
+  const owner = document.getElementById('ls-owner')?.value.trim();
+  const repo  = document.getElementById('ls-repo')?.value.trim();
+  const token = document.getElementById('ls-token')?.value.trim();
+  const status = document.getElementById('login-sync-status');
+  const ok     = document.getElementById('login-sync-ok');
+
+  if (!owner || !repo || !token) {
+    if (status) { status.style.display='block'; status.style.background='rgba(248,81,73,.1)'; status.style.color='var(--red)'; status.style.border='1px solid rgba(248,81,73,.2)'; status.textContent='Complete los tres campos.'; }
+    return;
+  }
+
+  if (status) { status.style.display='block'; status.style.background='rgba(210,153,34,.1)'; status.style.color='var(--yellow)'; status.style.border='1px solid rgba(210,153,34,.2)'; status.textContent='Conectando con GitHub...'; }
+
+  const cfg = { owner, repo, token };
+  STATE.githubCfg = cfg;
+  localStorage.setItem('qclab_gh', JSON.stringify(cfg));
+
+  try {
+    // Descargar todos los archivos — especialmente usuarios para habilitar el login
+    const files = ['config','maestro','reactivos','estandares','columnas',
+                   'insumos','sol_volumetricas','sol_otras','compras',
+                   'movimientos','notificaciones','avisos','usuarios'];
+    let descargados = 0;
+    for (const f of files) {
+      try {
+        const d = await ghRead(f + '.json');
+        if (d) { STATE.data[f] = d; saveLocal(f); descargados++; }
+      } catch(e) { /* archivo no existe aun, no es error */ }
+    }
+
+    if (status) { status.style.display='none'; }
+    if (ok) { ok.style.display='block'; }
+
+    // Colapsar el panel
+    const body  = document.getElementById('login-sync-body');
+    const arrow = document.getElementById('login-sync-arrow');
+    if (body)  body.style.display = 'none';
+    if (arrow) arrow.textContent  = '▼';
+
+    // Iniciar polling
+    if (STATE.syncInterval) clearInterval(STATE.syncInterval);
+    STATE.syncInterval = setInterval(syncFromGitHub, 60000);
+
+    toast(`Sincronizado (${descargados} archivos). Ya puede iniciar sesion.`, 'success');
+
+  } catch(e) {
+    if (status) { status.style.display='block'; status.style.background='rgba(248,81,73,.1)'; status.style.color='var(--red)'; status.style.border='1px solid rgba(248,81,73,.2)'; status.textContent='Error: ' + e.message; }
+    STATE.githubCfg = null;
+  }
+}
+
 function doLogin() {
   const u = document.getElementById('inp-username').value.trim();
   const p = document.getElementById('inp-password').value;
@@ -3086,23 +3175,18 @@ async function saveConsumo(modulo, id) {
     );
     // Adjuntar payload para ejecucion al aprobar
     const notifs2 = STATE.data.notificaciones?.pendientes || [];
-    const notif2 = notifs2.find(n => n.id === notifId);
+    const notif2  = notifs2.find(n => n.id === notifId);
     if (notif2) notif2.propuesta_consumo = propuesta;
-    const tieneToken = STATE.githubCfg?.queue_token || STATE.githubCfg?.token;
-    if (tieneToken) {
-      // Encolar en GitHub para que el Gestor la vea desde cualquier dispositivo
-      encolarOperacion({
-        tipo: 'consumo_propuesto', modulo, ref_id: id,
-        descripcion: `Propuesta consumo: ${tipo}${tipo==='directo'?' ('+cantidadDirecto+' ud.)':''}${obs?' | '+obs:''} — ${art?.descripcion||id}`,
-        payload: propuesta, usuario: STATE.session?.username
-      });
+
+    if (STATE.githubCfg?.token) {
+      // Con token compartido: escribir directo a GitHub
       await pushToGitHub('notificaciones');
       closeModal();
       toast('Propuesta enviada al Gestor', 'warning');
     } else {
       saveLocal('notificaciones');
       closeModal();
-      toast('Propuesta guardada localmente. Sin Token de Cola, el Gestor debera sincronizar desde este dispositivo.', 'warning');
+      toast('Propuesta guardada localmente. Configure el token GitHub para sincronizar.', 'warning');
     }
   }
 }
@@ -4501,55 +4585,61 @@ function renderConfig() {
     <div class="card">
       <div class="card-header"><span class="card-title">Sincronizacion GitHub</span></div>
       <p style="font-size:11px;color:var(--text2);margin-bottom:12px">
-        El repositorio GitHub actua como base de datos compartida con merge inteligente por registro.
-        Multiples gestores pueden operar en simultáneo sin perder datos.
+        Todos los usuarios — Gestores y Analistas — usan el mismo repositorio y el mismo token.
+        El token se distribuye al equipo por canal seguro (mensaje, mail interno, etc.).
       </p>
       <div class="form-grid">
         <div class="form-group"><label>Usuario/Org de GitHub</label>
           <input type="text" id="cfg-gh-owner" value="${esc(gh.owner||'')}" placeholder="nombre-usuario-github"></div>
         <div class="form-group"><label>Nombre del repositorio</label>
           <input type="text" id="cfg-gh-repo" value="${esc(gh.repo||'')}" placeholder="qclab-data"></div>
-        <div class="form-group"><label>Token (PAT) — lectura y escritura</label>
+        <div class="form-group"><label>Token (PAT) — scope: <code>repo</code></label>
           <input type="password" id="cfg-gh-token" value="${esc(gh.token||'')}" placeholder="ghp_...">
-          <span class="form-hint">Requerido para guardar cambios. Scopes necesarios: <code>repo</code></span></div>
-        <div class="form-group"><label>Token de Cola — solo escritura de colas (opcional)</label>
-          <input type="password" id="cfg-gh-queue-token" value="${esc(gh.queue_token||'')}" placeholder="ghp_...">
-          <span class="form-hint">PAT con acceso restringido a <code>cola_*.json</code>. Se distribuye a usuarios para que puedan enviar propuestas sin acceso a datos criticos.</span></div>
+          <span class="form-hint">Mismo token para todos los dispositivos. Requerido para leer y guardar cambios.</span></div>
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="saveGHConfig()">Guardar y Sincronizar</button>
         <button class="btn btn-secondary" onclick="forceSyncFromRemote()">⬇ Forzar descarga remota</button>
         ${gh.token ? `<button class="btn btn-secondary" onclick="publicarTodoAGitHub()">⬆ Publicar todos los datos</button>` : ''}
       </div>
-      <div style="margin-top:10px;font-size:10.5px;color:var(--text3)">
+      <div style="margin-top:8px;font-size:10.5px;color:var(--text3)">
         ID de este dispositivo: <span class="col-mono">${getDeviceId()}</span>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-header"><span class="card-title">🔗 Datos de conexion para otros dispositivos</span></div>
-      ${gh.owner && gh.repo ? `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div style="background:var(--bg3);border:1px solid rgba(139,92,246,.3);border-radius:var(--r);padding:12px">
-          <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px">👑 GESTOR (lectura + escritura)</div>
-          <div style="font-size:11px;margin-bottom:4px">Repositorio: <span class="col-mono">${esc(gh.owner)}/${esc(gh.repo)}</span></div>
-          <div style="font-size:11px;margin-bottom:6px">Token PAT: con scope <code>repo</code></div>
-          <div style="font-size:10px;color:var(--text3)">Cada Gestor configura su propio PAT en su dispositivo. El PAT no se comparte.</div>
-        </div>
-        <div style="background:var(--bg3);border:1px solid rgba(47,129,247,.3);border-radius:var(--r);padding:12px">
-          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px">👤 ANALISTA (propuestas)</div>
-          <div style="font-size:11px;margin-bottom:4px">Repositorio: <span class="col-mono">${esc(gh.owner)}/${esc(gh.repo)}</span></div>
-          <div style="font-size:11px;margin-bottom:6px">Token de Cola: <span class="col-mono">${gh.queue_token ? '✔ configurado' : '⚠ no configurado'}</span></div>
-          <div style="font-size:10px;color:var(--text3)">Sin token de cola los analistas solo pueden leer — no pueden enviar propuestas de consumo.</div>
+      <div class="card-header"><span class="card-title">🔗 Datos de conexion para el equipo</span></div>
+      ${gh.owner && gh.repo && gh.token ? `
+      <p style="font-size:11px;color:var(--text2);margin-bottom:10px">
+        Comparta estos tres datos con cada integrante del equipo. Los reciben una sola vez y los ingresan en Configuracion al abrir la app por primera vez.
+      </p>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-size:12px">
+        <div style="display:grid;gap:8px">
+          <div style="display:flex;gap:8px;align-items:baseline">
+            <span style="color:var(--text2);min-width:120px;font-size:11px">Usuario/Org:</span>
+            <span class="col-mono">${esc(gh.owner)}</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:baseline">
+            <span style="color:var(--text2);min-width:120px;font-size:11px">Repositorio:</span>
+            <span class="col-mono">${esc(gh.repo)}</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:baseline">
+            <span style="color:var(--text2);min-width:120px;font-size:11px">Token (PAT):</span>
+            <span class="col-mono" style="filter:blur(4px);cursor:pointer;user-select:all"
+              onclick="this.style.filter='none'" title="Clic para revelar">${esc(gh.token)}</span>
+            <span style="font-size:10px;color:var(--text3)">(clic para revelar)</span>
+          </div>
         </div>
       </div>
-      <div style="margin-top:10px;padding:10px;background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.2);border-radius:var(--r);font-size:11px">
-        <strong>Configuracion rapida para analistas:</strong><br>
-        1. Abrir <code>${location.href.split('#')[0]}</code> en el dispositivo<br>
-        2. Ir a Configuracion → Sincronizacion GitHub<br>
-        3. Ingresar: <strong>Repositorio:</strong> <span class="col-mono">${esc(gh.owner)}/${esc(gh.repo)}</span>
-           ${gh.queue_token ? `<br>4. Ingresar: <strong>Token de Cola</strong> (solicitar al Gestor)` : ''}
-      </div>` : `<div class="empty-state" style="padding:12px">Configure el repositorio primero.</div>`}
+      <div style="margin-top:10px;padding:10px;background:rgba(47,129,247,.08);border:1px solid rgba(47,129,247,.2);border-radius:var(--r);font-size:11px">
+        <strong>Pasos para el analista:</strong><br>
+        1. Abrir <span class="col-mono" style="font-size:10px">${location.href.split('#')[0]}</span><br>
+        2. Ir a <strong>Configuracion → Sincronizacion GitHub</strong><br>
+        3. Completar los tres datos de arriba y presionar <strong>Guardar y Sincronizar</strong>
+      </div>` : `
+      <div class="empty-state" style="padding:12px">
+        Complete los tres campos de sincronizacion (owner, repo y token) para ver los datos de conexion.
+      </div>`}
     </div>
 
     <div class="card">
@@ -5010,20 +5100,18 @@ async function doResetPass(id) {
 
 async function saveGHConfig() {
   const cfg = {
-    owner:       gv('cfg-gh-owner'),
-    repo:        gv('cfg-gh-repo'),
-    token:       gv('cfg-gh-token'),
-    queue_token: gv('cfg-gh-queue-token') || undefined
+    owner: gv('cfg-gh-owner'),
+    repo:  gv('cfg-gh-repo'),
+    token: gv('cfg-gh-token')
   };
   if (!cfg.owner || !cfg.repo) { toast('Ingrese usuario y repositorio', 'error'); return; }
-  if (!cfg.queue_token) delete cfg.queue_token;
   STATE.githubCfg = cfg;
   localStorage.setItem('qclab_gh', JSON.stringify(cfg));
   if (STATE.syncInterval) clearInterval(STATE.syncInterval);
   STATE.syncInterval = setInterval(syncFromGitHub, 60000);
   await syncFromGitHub();
   renderPage(STATE.page);
-  toast('Configuracion GitHub guardada y sincronizado','success');
+  toast('Configuracion GitHub guardada y sincronizado', 'success');
 }
 
 async function publicarTodoAGitHub() {
@@ -5370,6 +5458,13 @@ function init() {
 
   // Mostrar login
   document.getElementById('login-screen').classList.add('open');
+
+  // Si ya hay config GitHub guardada, mostrar indicador de conexión
+  if (STATE.githubCfg?.owner && STATE.githubCfg?.token) {
+    const ok = document.getElementById('login-sync-ok');
+    if (ok) ok.style.display = 'block';
+  }
+
   document.getElementById('inp-password').addEventListener('keydown', e => {
     if (e.key === 'Enter') doLogin();
   });
