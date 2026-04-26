@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "706e97b3-f517-4d42-ae24-4522c8de76a7",
+      "fecha": "2026-04-26T16:10:26.039Z",
+      "usuario": "admin",
+      "tipo": "ingreso",
+      "modulo": "sol_volumetricas",
+      "ref_id": "7df8fd5b-0b40-4d65-b548-16e83b6d6bb5",
+      "detalle": "Ingreso: NaOH 0.1 N SVH-C12"
+    },
+    {
       "id": "ab399d4f-d3cd-4700-9ece-f9fc3714811e",
       "fecha": "2026-04-26T16:08:14.969Z",
       "usuario": "admin",
@@ -25,7 +34,7 @@
       "tipo": "maestro",
       "modulo": "maestro",
       "ref_id": "48195d5d",
-      "detalle": "Editado: ÃÂcido sulfÃÂºrico 98% ACS (reactivo)"
+      "detalle": "Editado: ÃÂÃÂcido sulfÃÂÃÂºrico 98% ACS (reactivo)"
     },
     {
       "id": "0f4e0f59-7e03-432a-a767-025c141f4b75",
@@ -34,7 +43,7 @@
       "tipo": "maestro",
       "modulo": "maestro",
       "ref_id": "48195d5d",
-      "detalle": "Editado: ÃÂÃÂcido sulfÃÂÃÂºrico 98% ACS (reactivo)"
+      "detalle": "Editado: ÃÂÃÂÃÂÃÂcido sulfÃÂÃÂÃÂÃÂºrico 98% ACS (reactivo)"
     },
     {
       "id": "b8dba10f-eb1c-4a6c-8ee1-91b6dfcd59f2",
@@ -43,7 +52,7 @@
       "tipo": "ingreso",
       "modulo": "reactivos",
       "ref_id": "85c250d0-d175-462c-9039-23c4c412b5df",
-      "detalle": "Ingreso: ÃÂÃÂÃÂÃÂcido sulfÃÂÃÂÃÂÃÂºrico 98% ACS RC26001"
+      "detalle": "Ingreso: ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂcido sulfÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂºrico 98% ACS RC26001"
     },
     {
       "id": "9765ebd8-cd04-4d59-abe4-e0e5c4a299b2",
