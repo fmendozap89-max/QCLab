@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "d769fbbe-9f74-4e91-b858-ff7e8be7717c",
+      "fecha": "2026-04-26T16:12:09.270Z",
+      "usuario": "admin",
+      "tipo": "baja",
+      "modulo": "sol_volumetricas",
+      "ref_id": "7df8fd5b-0b40-4d65-b548-16e83b6d6bb5",
+      "detalle": "Baja directa por gestor. Motivo: error"
+    },
+    {
       "id": "3598aadf-1c22-4d7f-ba21-c97ac1a9dd24",
       "fecha": "2026-04-26T16:11:37.719Z",
       "usuario": "admin",
@@ -43,7 +52,7 @@
       "tipo": "maestro",
       "modulo": "maestro",
       "ref_id": "48195d5d",
-      "detalle": "Editado: ÃÂÃÂÃÂÃÂcido sulfÃÂÃÂÃÂÃÂºrico 98% ACS (reactivo)"
+      "detalle": "Editado: ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂcido sulfÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂºrico 98% ACS (reactivo)"
     },
     {
       "id": "0f4e0f59-7e03-432a-a767-025c141f4b75",
@@ -52,7 +61,7 @@
       "tipo": "maestro",
       "modulo": "maestro",
       "ref_id": "48195d5d",
-      "detalle": "Editado: ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂcido sulfÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂºrico 98% ACS (reactivo)"
+      "detalle": "Editado: ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂcido sulfÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂºrico 98% ACS (reactivo)"
     },
     {
       "id": "b8dba10f-eb1c-4a6c-8ee1-91b6dfcd59f2",
@@ -61,7 +70,7 @@
       "tipo": "ingreso",
       "modulo": "reactivos",
       "ref_id": "85c250d0-d175-462c-9039-23c4c412b5df",
-      "detalle": "Ingreso: ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂcido sulfÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂºrico 98% ACS RC26001"
+      "detalle": "Ingreso: ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂcido sulfÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂºrico 98% ACS RC26001"
     },
     {
       "id": "9765ebd8-cd04-4d59-abe4-e0e5c4a299b2",
