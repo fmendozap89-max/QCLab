@@ -22,7 +22,16 @@
       "codigo": "SVH-C15",
       "fecha_prep": "2026-04-26",
       "vencimiento": "2027-04-26",
-      "titulos": []
+      "titulos": [
+        {
+          "id": "3982543f-e909-438c-94b7-ff9e466c98c1",
+          "fecha_titulo": "2026-04-26",
+          "vencimiento_titulo": "2026-05-26",
+          "valor": 0.1015,
+          "usuario": "admin",
+          "analista": "admin"
+        }
+      ]
     }
   ]
 }
