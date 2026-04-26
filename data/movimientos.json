@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "46bc641e-d301-44a2-a6a6-0ef67f6677f1",
+      "fecha": "2026-04-26T17:11:22.499Z",
+      "usuario": "admin",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "e6eb0ec1-ffce-4e0f-8c91-5eef9014fcdf",
+      "detalle": "Apertura: cerradas 3→2, en uso 0→1 | se abrio"
+    },
+    {
       "id": "42d0719c-de96-4c73-a117-ea014ef56d79",
       "fecha": "2026-04-26T17:11:03.737Z",
       "usuario": "admin",
