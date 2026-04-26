@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "6730f019-ed96-47e0-a553-8c5be45b9783",
+      "fecha": "2026-04-26T16:13:24.588Z",
+      "usuario": "admin",
+      "tipo": "titulo",
+      "modulo": "sol_volumetricas",
+      "ref_id": "f794d158-64f3-4729-91f0-89f82081ce2b",
+      "detalle": "Nuevo título: 0.1002, fecha 2026-05-27"
+    },
+    {
       "id": "2e37dc62-842d-4ebe-b8db-66be704a3452",
       "fecha": "2026-04-26T16:12:58.453Z",
       "usuario": "admin",
