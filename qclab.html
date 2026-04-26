@@ -2,9 +2,21 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="QC Lab Stock — Sistema de gestión de stock para laboratorio de control de calidad farmacéutico">
+<meta name="theme-color" content="#0d1117">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="QC Lab">
+<meta property="og:title" content="QC Lab · Gestión de Stock">
+<meta property="og:description" content="Sistema de gestión de stock para laboratorio de control de calidad farmacéutico">
+<meta property="og:type" content="application">
 <title>QC Lab · Gestión de Stock</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Preconnect para reducir latencia del CDN -->
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
+        onerror="document.getElementById('xlsx-warn').style.display='block'"></script>
 <style>
   /* ── DESIGN TOKENS ─────────────────────────────────────── */
   :root {
@@ -428,9 +440,30 @@
 
 .form-readonly{padding:7px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);font-size:12px;color:var(--text2)}
 .form-req{color:var(--red);margin-left:2px}
+/* ── SPLASH LOADER ─────────────────────────────────────── */
+#app-splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .4s}
+#app-splash .splash-logo{font-size:48px;font-weight:800;color:var(--accent);letter-spacing:-2px}
+#app-splash .splash-sub{font-size:13px;color:var(--text2)}
+#app-splash .splash-bar{width:200px;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+#app-splash .splash-bar-inner{height:100%;width:0;background:var(--accent);border-radius:2px;transition:width .3s}
+#app-splash.hidden{opacity:0;pointer-events:none}
+/* ── AVISO XLSX ─────────────────────────────────────────── */
+#xlsx-warn{display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(210,153,34,.95);color:#000;padding:8px 16px;border-radius:var(--r);font-size:12px;z-index:9998;max-width:90vw;text-align:center}
+/* ── SAFE AREA (notch en móvil) ─────────────────────────── */
+#sidebar{padding-bottom:env(safe-area-inset-bottom)}
+#main{padding-bottom:env(safe-area-inset-bottom)}
 </style>
 </head>
 <body>
+
+<!-- ═══ SPLASH ════════════════════════════════════════════════ -->
+<div id="app-splash">
+  <div class="splash-logo">QC</div>
+  <div class="splash-sub">QC Lab · Gestión de Stock</div>
+  <div class="splash-bar"><div class="splash-bar-inner" id="splash-bar"></div></div>
+  <div class="splash-sub" id="splash-msg" style="font-size:11px">Iniciando...</div>
+</div>
+<div id="xlsx-warn">⚠ La librería Excel no pudo cargarse. Las funciones de exportación/importación no estarán disponibles.</div>
 
 <!-- ═══ LOGIN ═══════════════════════════════════════════════ -->
 <div id="login-screen" class="open">
@@ -876,16 +909,8 @@ function applySession() {
   document.getElementById('user-name-display').textContent = STATE.session.display;
   document.getElementById('user-role-display').textContent = STATE.session.role === 'gestor' ? 'Gestor' : 'Usuario';
   if (!isGestor()) document.getElementById('nav-admin-section').style.display = 'none';
-
-  // Cargar config GitHub
-  const gh = localStorage.getItem('qclab_gh');
-  if (gh) {
-    STATE.githubCfg = JSON.parse(gh);
-    syncFromGitHub();
-    STATE.syncInterval = setInterval(syncFromGitHub, 60000);
-  }
-
   updateNotifBadge();
+  updateAvisosBadge();
   navigate('dashboard');
 }
 
@@ -3430,6 +3455,7 @@ function renderMaestroTab(modulo) {
       <div class="card-actions">
         <button class="copy-table-btn" onclick="copyTableToClipboard('tbl-m-${modulo}')">📋 Copiar</button>
         <button class="btn btn-secondary btn-sm" onclick="exportMaestroExcel('${modulo}')">⬇ Excel</button>
+        <button class="btn btn-secondary btn-sm" onclick="openImportMaestroModal('${modulo}')">⬆ Importar Excel</button>
         <button class="btn btn-primary btn-sm" onclick="openMaestroModal('','${modulo}')">+ Nuevo</button>
       </div>
     </div>
@@ -3684,6 +3710,448 @@ async function saveMaestro(existingId, modulo) {
   toast('Artículo guardado en Maestro', 'success');
 }
 
+
+/* ════════════════════════════════════════════════════════════
+   IMPORTACIÓN DE MAESTRO DESDE EXCEL
+════════════════════════════════════════════════════════════ */
+
+/* Definicion de columnas esperadas por tipo — usadas para plantilla y para parsear */
+const MAESTRO_IMPORT_SPEC = {
+  reactivo: {
+    label: 'Reactivos',
+    cols: [
+      { h:'descripcion',    req:true,  tip:'Nombre completo del reactivo. Ej: Acido clorhidrico 37% ACS' },
+      { h:'codigo_erp',     req:false, tip:'Codigo del sistema ERP. Ej: RC-001' },
+      { h:'numero_cas',     req:false, tip:'Numero CAS del compuesto. Ej: 7647-01-0' },
+      { h:'unidad',         req:true,  tip:'Unidad de medida del envase. Ej: L, mL, kg, g, unid' },
+      { h:'almacenamiento', req:false, tip:'Condicion de almacenamiento. Ej: Ambiente, Heladera, Freezer, Gabinete AC' },
+      { h:'stock_minimo',   req:false, tip:'Numero entero o decimal. Ej: 2' },
+      { h:'aviso_val',      req:false, tip:'Numero entero para el aviso de vencimiento. Ej: 3' },
+      { h:'aviso_uni',      req:false, tip:'Unidad del aviso: dias, semanas o meses' },
+      { h:'observaciones',  req:false, tip:'Texto libre. Opcional.' },
+    ]
+  },
+  estandar: {
+    label: 'Estandares',
+    cols: [
+      { h:'descripcion',    req:true,  tip:'Nombre del estandar. Ej: Cafeina USP RS' },
+      { h:'codigo_erp',     req:false, tip:'Codigo ERP. Ej: EST-001' },
+      { h:'unidad',         req:true,  tip:'Unidad. Ej: mg, g' },
+      { h:'almacenamiento', req:false, tip:'Ej: Heladera, Freezer, Ambiente' },
+      { h:'stock_minimo',   req:false, tip:'Numero. Ej: 200' },
+      { h:'aviso_val',      req:false, tip:'Numero entero. Ej: 6' },
+      { h:'aviso_uni',      req:false, tip:'dias, semanas o meses' },
+      { h:'uso_producto',   req:false, tip:'Producto o MP al que se destina. Ej: Ibuprofeno capsulas' },
+      { h:'observaciones',  req:false, tip:'Texto libre.' },
+    ]
+  },
+  insumo: {
+    label: 'Insumos',
+    cols: [
+      { h:'descripcion',    req:true,  tip:'Nombre del insumo. Ej: Vial HPLC 1.5 mL amber' },
+      { h:'codigo_erp',     req:false, tip:'Codigo ERP. Ej: INS-001' },
+      { h:'unidad',         req:true,  tip:'Ej: unid, caja, paq' },
+      { h:'stock_minimo',   req:false, tip:'Numero. Ej: 200' },
+      { h:'aviso_val',      req:false, tip:'Numero. Ej: 1' },
+      { h:'aviso_uni',      req:false, tip:'dias, semanas o meses' },
+      { h:'observaciones',  req:false, tip:'Texto libre.' },
+    ]
+  },
+  columna: {
+    label: 'Columnas Cromatograficas',
+    cols: [
+      { h:'descripcion',    req:true,  tip:'Nombre de la columna. Ej: Symmetry C18 250x4.6' },
+      { h:'codigo_erp',     req:false, tip:'Codigo ERP. Ej: COL-001' },
+      { h:'relleno',        req:false, tip:'Designacion USP de la fase estacionaria. Ej: L1, L11, L7' },
+      { h:'dim_l',          req:false, tip:'Longitud en mm. Ej: 150' },
+      { h:'dim_di',         req:false, tip:'Diametro interno en mm. Ej: 4.6' },
+      { h:'dim_dp',         req:false, tip:'Tamano de particula en micrones. Ej: 5.0' },
+      { h:'observaciones',  req:false, tip:'Texto libre.' },
+    ]
+  },
+  sol_volumetrica: {
+    label: 'Soluciones Volumetricas',
+    cols: [
+      { h:'descripcion',        req:true,  tip:'Ej: NaOH 0.1 N' },
+      { h:'codigo_base',        req:true,  tip:'Prefijo del codigo de preparacion. Ej: SVH (resultara en SVH-C01, SVH-C02...)' },
+      { h:'validez_prep_val',   req:true,  tip:'Numero entero. Ej: 90' },
+      { h:'validez_prep_uni',   req:true,  tip:'dias, semanas o meses' },
+      { h:'validez_tit_val',    req:true,  tip:'Numero entero. Ej: 30' },
+      { h:'validez_tit_uni',    req:true,  tip:'dias, semanas o meses' },
+      { h:'aviso_val',          req:false, tip:'Numero. Ej: 2' },
+      { h:'aviso_uni',          req:false, tip:'dias, semanas o meses' },
+      { h:'observaciones',      req:false, tip:'Texto libre.' },
+    ]
+  },
+  sol_otra: {
+    label: 'Soluciones Reactivo / Adecuabilidad',
+    cols: [
+      { h:'descripcion',        req:true,  tip:'Ej: Fase movil HPLC Ibuprofeno A' },
+      { h:'codigo_base',        req:true,  tip:'Prefijo del codigo. Ej: SRFIA' },
+      { h:'tipo_solucion',      req:true,  tip:'Valores posibles: reactivo o adecuabilidad' },
+      { h:'validez_prep_val',   req:true,  tip:'Numero entero. Ej: 7' },
+      { h:'validez_prep_uni',   req:true,  tip:'dias, semanas o meses' },
+      { h:'aviso_val',          req:false, tip:'Numero. Ej: 2' },
+      { h:'aviso_uni',          req:false, tip:'dias, semanas o meses' },
+      { h:'observaciones',      req:false, tip:'Texto libre.' },
+    ]
+  }
+};
+
+function openImportMaestroModal(modulo) {
+  const tipo = MAESTRO_TIPO_MAP[modulo] || modulo;
+  const spec = MAESTRO_IMPORT_SPEC[tipo];
+  if (!spec) { toast('Tipo de modulo no soportado para importacion', 'error'); return; }
+
+  const colsTable = spec.cols.map(c => `
+    <tr>
+      <td class="col-mono" style="font-size:11px">${c.h}</td>
+      <td><span class="badge ${c.req?'badge-vto-vencido':'badge-gray'}">${c.req?'Obligatorio':'Opcional'}</span></td>
+      <td style="font-size:11px;color:var(--text2)">${c.tip}</td>
+    </tr>`).join('');
+
+  const uniNota = `
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px;font-size:11px;margin-top:10px">
+      <strong>Valores validos para unidades de tiempo</strong> (columnas <span class="col-mono">aviso_uni</span>,
+      <span class="col-mono">validez_prep_uni</span>, <span class="col-mono">validez_tit_uni</span>):
+      <span class="badge badge-gray">dias</span>
+      <span class="badge badge-gray">semanas</span>
+      <span class="badge badge-gray">meses</span>
+      — escribir exactamente en minusculas, sin acento.
+    </div>`;
+
+  openModal(`Importar Maestro — ${spec.label}`, `
+    <div class="tabs" id="imp-tabs" style="margin-bottom:12px">
+      <button class="tab active" onclick="switchTab(event,'imp-tab-guia')">📋 Guia de formato</button>
+      <button class="tab" onclick="switchTab(event,'imp-tab-cargar')">⬆ Cargar archivo</button>
+    </div>
+
+    <div id="imp-tab-guia">
+      <p style="font-size:11px;color:var(--text2);margin-bottom:10px">
+        La primera fila del archivo Excel debe contener exactamente los encabezados indicados a continuacion.
+        El orden de las columnas es libre — el sistema las identifica por nombre.
+        Las columnas opcionales pueden omitirse.
+      </p>
+      <div class="table-wrap" style="margin-bottom:8px">
+        <table><thead><tr><th>Columna (encabezado exacto)</th><th>Tipo</th><th>Como completar</th></tr></thead>
+        <tbody>${colsTable}</tbody></table>
+      </div>
+      ${uniNota}
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="descargarPlantillaMaestro('${modulo}')">
+          ⬇ Descargar plantilla Excel
+        </button>
+      </div>
+    </div>
+
+    <div id="imp-tab-cargar" style="display:none">
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Archivo Excel (.xlsx)</label>
+        <input type="file" id="imp-maestro-file" accept=".xlsx,.xls" style="padding:6px">
+      </div>
+      <div id="imp-maestro-preview"></div>
+    </div>
+  `,
+  `<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+   <button class="btn btn-primary" onclick="importarMaestroExcel('${modulo}')">Analizar y cargar</button>`
+  );
+}
+
+function descargarPlantillaMaestro(modulo) {
+  if (!window.XLSX) { toast('Libreria XLSX no disponible', 'error'); return; }
+  const tipo = MAESTRO_TIPO_MAP[modulo] || modulo;
+  const spec = MAESTRO_IMPORT_SPEC[tipo];
+  if (!spec) return;
+
+  const hdrs = spec.cols.map(c => c.h);
+
+  // Fila de ejemplo por tipo
+  const ejemplos = {
+    reactivo:        ['Acido clorhidrico 37% ACS','RC-001','7647-01-0','L','Gabinete AC','2','3','meses',''],
+    estandar:        ['Cafeina USP RS','EST-001','mg','Heladera','200','6','meses','Ibuprofeno capsulas',''],
+    insumo:          ['Vial HPLC 1.5 mL amber 9mm','INS-001','unid','200','1','meses',''],
+    columna:         ['Symmetry C18 250x4.6','COL-001','L1','250','4.6','5.0',''],
+    sol_volumetrica: ['NaOH 0.1 N','SVH','90','dias','30','dias','2','semanas',''],
+    sol_otra:        ['Fase movil HPLC Ibuprofeno A','SRFIA','reactivo','7','dias','2','dias',''],
+  };
+
+  const wb = XLSX.utils.book_new();
+  const data = [hdrs, ejemplos[tipo] || hdrs.map(()=>'')];
+  const ws = XLSX.utils.aoa_to_sheet(data);
+
+  // Estilo encabezado — anchos
+  ws['!cols'] = hdrs.map(h => ({ wch: Math.max(h.length + 4, 16) }));
+
+  // Hoja de instrucciones
+  const instRows = [
+    ['INSTRUCCIONES DE USO — Plantilla Maestro ' + spec.label],
+    [''],
+    ['1. La primera fila contiene los encabezados — NO modificar.'],
+    ['2. Completar una fila por articulo a partir de la fila 2.'],
+    ['3. Las columnas marcadas como OBLIGATORIO deben completarse siempre.'],
+    ['4. Unidades de tiempo validas: dias / semanas / meses (sin acento, minusculas).'],
+    ['5. Guardar como .xlsx antes de importar.'],
+    [''],
+    ['COLUMNAS Y COMO COMPLETARLAS:'],
+    ...spec.cols.map(c => [`  ${c.h}  [${c.req?'OBLIGATORIO':'opcional'}]  →  ${c.tip}`]),
+  ];
+  const wsInst = XLSX.utils.aoa_to_sheet(instRows);
+  wsInst['!cols'] = [{ wch: 90 }];
+
+  XLSX.utils.book_append_sheet(wb, ws, spec.label.slice(0,31));
+  XLSX.utils.book_append_sheet(wb, wsInst, 'Instrucciones');
+  XLSX.writeFile(wb, `Plantilla_Maestro_${tipo}_${today()}.xlsx`);
+}
+
+/* Convierte una fila del Excel a un objeto de articulo del Maestro */
+function parsearFilaMaestro(row, tipo) {
+  const g = (k) => {
+    const v = row[k];
+    return v !== undefined && v !== null ? String(v).trim() : '';
+  };
+  const n = (k) => { const v = Number(g(k)); return isNaN(v) ? null : v; };
+
+  // Normalizar unidad de tiempo
+  const normUni = (u) => {
+    const s = (u||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if (/^d/.test(s)) return 'dias';
+    if (/^s/.test(s)) return 'semanas';
+    if (/^m/.test(s)) return 'meses';
+    return u || 'meses';
+  };
+
+  const art = {
+    id: uuid(), tipo, activo: true,
+    descripcion: g('descripcion'),
+    observaciones: g('observaciones') || null,
+  };
+
+  if (!art.descripcion) return { ok:false, error:'Descripcion obligatoria' };
+
+  if (tipo === 'reactivo' || tipo === 'estandar' || tipo === 'insumo' || tipo === 'columna') {
+    art.codigo_erp = g('codigo_erp') || null;
+  }
+
+  if (tipo === 'reactivo') {
+    art.numero_cas     = g('numero_cas') || null;
+    art.unidad         = g('unidad') || null;
+    art.almacenamiento = g('almacenamiento') || null;
+    art.stock_minimo   = n('stock_minimo');
+    const av = normUni(g('aviso_uni'));
+    art.aviso_val = n('aviso_val'); art.aviso_uni = av;
+    art.aviso_meses = art.aviso_val ? vldMeses(art.aviso_val, av) : null;
+    if (!art.unidad) return { ok:false, error:'Unidad obligatoria' };
+  }
+  if (tipo === 'estandar') {
+    art.unidad         = g('unidad') || null;
+    art.almacenamiento = g('almacenamiento') || null;
+    art.stock_minimo   = n('stock_minimo');
+    art.uso_producto   = g('uso_producto') || null;
+    const av = normUni(g('aviso_uni'));
+    art.aviso_val = n('aviso_val'); art.aviso_uni = av;
+    art.aviso_meses = art.aviso_val ? vldMeses(art.aviso_val, av) : null;
+    if (!art.unidad) return { ok:false, error:'Unidad obligatoria' };
+  }
+  if (tipo === 'insumo') {
+    art.unidad       = g('unidad') || null;
+    art.stock_minimo = n('stock_minimo');
+    const av = normUni(g('aviso_uni'));
+    art.aviso_val = n('aviso_val'); art.aviso_uni = av;
+    art.aviso_meses = art.aviso_val ? vldMeses(art.aviso_val, av) : null;
+    if (!art.unidad) return { ok:false, error:'Unidad obligatoria' };
+  }
+  if (tipo === 'columna') {
+    art.relleno = g('relleno') || null;
+    art.dim_l   = n('dim_l');
+    art.dim_di  = n('dim_di');
+    art.dim_dp  = n('dim_dp');
+  }
+  if (tipo === 'sol_volumetrica') {
+    art.codigo_base = (g('codigo_base')||'').toUpperCase() || null;
+    if (!art.codigo_base) return { ok:false, error:'Codigo base obligatorio' };
+    const vpU = normUni(g('validez_prep_uni'));
+    const vtU = normUni(g('validez_tit_uni'));
+    art.validez_prep_val = n('validez_prep_val'); art.validez_prep_uni = vpU;
+    art.validez_tit_val  = n('validez_tit_val');  art.validez_tit_uni  = vtU;
+    if (!art.validez_prep_val || !art.validez_tit_val) return { ok:false, error:'Validez preparacion y titulo obligatorias' };
+    art.validez_prep_dias = Math.round(vldDias(art.validez_prep_val, vpU));
+    art.validez_tit_dias  = Math.round(vldDias(art.validez_tit_val,  vtU));
+    const av = normUni(g('aviso_uni'));
+    art.aviso_val = n('aviso_val'); art.aviso_uni = av;
+    art.aviso_meses = art.aviso_val ? vldMeses(art.aviso_val, av) : null;
+  }
+  if (tipo === 'sol_otra') {
+    art.codigo_base = (g('codigo_base')||'').toUpperCase() || null;
+    if (!art.codigo_base) return { ok:false, error:'Codigo base obligatorio' };
+    const ts = g('tipo_solucion').toLowerCase();
+    art.tipo_solucion = ts.startsWith('adec') ? 'adecuabilidad' : 'reactivo';
+    const vpU = normUni(g('validez_prep_uni'));
+    art.validez_prep_val = n('validez_prep_val'); art.validez_prep_uni = vpU;
+    if (!art.validez_prep_val) return { ok:false, error:'Validez preparacion obligatoria' };
+    art.validez_prep_dias = Math.round(vldDias(art.validez_prep_val, vpU));
+    const av = normUni(g('aviso_uni'));
+    art.aviso_val = n('aviso_val'); art.aviso_uni = av;
+    art.aviso_meses = art.aviso_val ? vldMeses(art.aviso_val, av) : null;
+  }
+
+  return { ok:true, art };
+}
+
+/* Detecta si el articulo entrante tiene conflicto con uno existente */
+function detectarConflictoMaestro(artNuevo, tipo) {
+  const existentes = (STATE.data.maestro?.articulos||[]).filter(a => a.tipo === tipo);
+  const clave = artNuevo.codigo_erp || artNuevo.codigo_base;
+  if (!clave) return null;
+  return existentes.find(a => (a.codigo_erp && a.codigo_erp === artNuevo.codigo_erp) ||
+                               (a.codigo_base && a.codigo_base === artNuevo.codigo_base)) || null;
+}
+
+async function importarMaestroExcel(modulo) {
+  const file = document.getElementById('imp-maestro-file')?.files?.[0];
+  if (!file) { toast('Seleccione un archivo Excel primero', 'error'); return; }
+  if (!window.XLSX) { toast('Libreria XLSX no disponible', 'error'); return; }
+
+  const tipo = MAESTRO_TIPO_MAP[modulo] || modulo;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const wb = XLSX.read(e.target.result, { type:'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval:'' });
+
+      if (!rows.length) { toast('El archivo no tiene datos', 'error'); return; }
+
+      // Parsear todas las filas
+      const resultados = rows.map((row, i) => ({ fila: i+2, ...parsearFilaMaestro(row, tipo) }));
+      const errores    = resultados.filter(r => !r.ok);
+      const validos    = resultados.filter(r => r.ok);
+
+      // Separar en nuevos y conflictos
+      const nuevos     = [];
+      const conflictos = [];
+      for (const r of validos) {
+        const existente = detectarConflictoMaestro(r.art, tipo);
+        if (existente) conflictos.push({ art: r.art, existente, fila: r.fila });
+        else           nuevos.push({ art: r.art, fila: r.fila });
+      }
+
+      closeModal();
+
+      // Mostrar resumen y procesar
+      STATE._importMaestroModulo   = modulo;
+      STATE._importMaestroNuevos   = nuevos;
+      STATE._importMaestroConflictos = conflictos;
+      STATE._importMaestroErrores  = errores;
+      STATE._importMaestroIdx      = 0;
+
+      await procesarImportMaestro();
+
+    } catch(err) {
+      toast('Error al leer el archivo: ' + err.message, 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function procesarImportMaestro() {
+  const modulo     = STATE._importMaestroModulo;
+  const nuevos     = STATE._importMaestroNuevos     || [];
+  const conflictos = STATE._importMaestroConflictos || [];
+  const errores    = STATE._importMaestroErrores    || [];
+  const idx        = STATE._importMaestroIdx        || 0;
+
+  // Si quedan conflictos por resolver, mostrar el proximo
+  if (idx < conflictos.length) {
+    const c = conflictos[idx];
+    const tipo = MAESTRO_TIPO_MAP[modulo] || modulo;
+    const spec = MAESTRO_IMPORT_SPEC[tipo];
+
+    // Tabla comparativa de campos
+    const camposComp = (spec?.cols||[]).map(col => {
+      const kNuevo = c.art[col.h];
+      const kExist = c.existente[col.h];
+      const dif = String(kNuevo??'') !== String(kExist??'');
+      return `<tr${dif?' style="background:rgba(210,153,34,.08)"':''}>
+        <td style="font-size:11px;color:var(--text2)">${col.h}</td>
+        <td style="font-size:11px">${esc(String(kExist??'—'))}</td>
+        <td style="font-size:11px${dif?';color:var(--yellow);font-weight:600':''}">${esc(String(kNuevo??'—'))}</td>
+      </tr>`;
+    }).join('');
+
+    openModal(`Conflicto fila ${c.fila} — ${idx+1} de ${conflictos.length}`,
+      `<div class="info-box" style="margin-bottom:10px">
+        <strong>${esc(c.art.descripcion)}</strong> ya existe en el Maestro con el mismo codigo
+        <span class="col-mono">${esc(c.art.codigo_erp||c.art.codigo_base||'')}</span>.
+        ¿Que desea hacer?
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr><th>Campo</th><th>Existente</th><th>Planilla (nuevo)</th></tr></thead>
+        <tbody>${camposComp}</tbody></table>
+      </div>
+      <p style="font-size:10px;color:var(--text3);margin-top:8px">Las filas resaltadas tienen valores diferentes.</p>`,
+      `<button class="btn btn-secondary" onclick="resolverConflictoMaestro('ignorar')">Conservar existente</button>
+       <button class="btn btn-primary"   onclick="resolverConflictoMaestro('actualizar')">Actualizar con planilla</button>`
+    );
+    return;
+  }
+
+  // Todos los conflictos resueltos — aplicar cambios
+  if (!STATE.data.maestro) STATE.data.maestro = { articulos: [] };
+
+  let insertados = 0, actualizados = 0;
+  for (const n of nuevos) {
+    STATE.data.maestro.articulos.push(n.art);
+    insertados++;
+  }
+  for (const c of conflictos) {
+    if (c._decision === 'actualizar') {
+      const idx2 = STATE.data.maestro.articulos.findIndex(a => a.id === c.existente.id);
+      if (idx2 >= 0) {
+        STATE.data.maestro.articulos[idx2] = { ...c.existente, ...c.art, id: c.existente.id };
+        actualizados++;
+      }
+    }
+  }
+
+  registrarMovimiento('maestro', 'maestro', 'import',
+    `Importacion Excel: ${insertados} nuevos, ${actualizados} actualizados, ${errores.length} errores.`);
+  await pushToGitHub('maestro');
+  await pushToGitHub('movimientos');
+
+  // Limpiar estado temporal
+  delete STATE._importMaestroModulo;
+  delete STATE._importMaestroNuevos;
+  delete STATE._importMaestroConflictos;
+  delete STATE._importMaestroErrores;
+  delete STATE._importMaestroIdx;
+
+  renderPage(STATE.page);
+
+  // Resumen final
+  const resumenErrores = errores.length
+    ? `<br><span style="color:var(--red)">${errores.length} fila(s) con error: ${errores.map(e=>`fila ${e.fila} — ${e.error}`).join('; ')}</span>`
+    : '';
+  toast(`Importacion completada: ${insertados} nuevos, ${actualizados} actualizados.`, 'success');
+  if (errores.length) {
+    setTimeout(() => openModal('Errores en la importacion',
+      `<p style="font-size:12px;margin-bottom:10px">Las siguientes filas no pudieron importarse:</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Fila</th><th>Motivo</th></tr></thead>
+        <tbody>${errores.map(e=>`<tr><td class="col-mono">${e.fila}</td><td style="font-size:11px;color:var(--red)">${esc(e.error)}</td></tr>`).join('')}</tbody>
+      </table></div>`,
+      `<button class="btn btn-primary" onclick="closeModal()">Cerrar</button>`
+    ), 400);
+  }
+}
+
+async function resolverConflictoMaestro(decision) {
+  const conflictos = STATE._importMaestroConflictos || [];
+  const idx = STATE._importMaestroIdx || 0;
+  if (conflictos[idx]) conflictos[idx]._decision = decision;
+  STATE._importMaestroIdx = idx + 1;
+  closeModal();
+  await procesarImportMaestro();
+}
 
 function exportMaestroExcel(modulo) {
   exportToExcel('maestro_' + modulo);
@@ -4225,8 +4693,13 @@ async function forceSyncFromRemote() {
   if (!STATE.githubCfg?.owner || !STATE.githubCfg?.repo) {
     toast('Configure GitHub primero', 'error'); return;
   }
-  if (!confirm('Descargar estado remoto. Los datos locales no sincronizados se perderán. ¿Confirmar?')) return;
-  setSyncStatus('syncing', 'Descargando…');
+  openModal('Confirmar descarga remota',
+    `<p style="font-size:12px">Esto descargara el estado de GitHub y sobreescribira los datos locales no publicados. ¿Confirmar?</p>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+     <button class="btn btn-danger" onclick="closeModal();_doForceSyncFromRemote()">Descargar y sobreescribir</button>`
+  );
+}
+async function _doForceSyncFromRemote() {
   const files = ['config','maestro','reactivos','estandares','columnas',
                  'insumos','sol_volumetricas','sol_otras','compras','movimientos','notificaciones'];
   let ok = 0;
@@ -4318,7 +4791,13 @@ async function saveGHConfig() {
 
 async function publicarTodoAGitHub() {
   if (!STATE.githubCfg?.token) { toast('Se requiere PAT para publicar', 'error'); return; }
-  if (!confirm('Esto publicara TODOS los modulos locales en GitHub, sobreescribiendo el contenido remoto. ¿Confirmar?')) return;
+  openModal('Confirmar publicacion completa',
+    `<p style="font-size:12px">Esto publicara <strong>todos los modulos locales</strong> en GitHub, sobreescribiendo el contenido remoto. Use esto solo despues de cargar datos iniciales.</p>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+     <button class="btn btn-danger" onclick="closeModal();_doPublicarTodo()">Publicar todo</button>`
+  );
+}
+async function _doPublicarTodo() {
   const files = ['config','maestro','reactivos','estandares','columnas',
                  'insumos','sol_volumetricas','sol_otras','compras','movimientos','notificaciones','avisos','usuarios'];
   let ok = 0, err = 0;
@@ -4578,23 +5057,82 @@ function switchTab(event, targetId) {
 /* ════════════════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   SPLASH — control de visibilidad
+════════════════════════════════════════════════════════════ */
+function splashProgress(pct, msg) {
+  const bar = document.getElementById('splash-bar');
+  const txt = document.getElementById('splash-msg');
+  if (bar) bar.style.width = pct + '%';
+  if (txt) txt.textContent = msg || '';
+}
+function splashHide() {
+  const el = document.getElementById('app-splash');
+  if (el) { el.classList.add('hidden'); setTimeout(()=>el.remove(), 500); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   HASH NAVIGATION — botón atrás del navegador
+════════════════════════════════════════════════════════════ */
+function pushHash(page) {
+  if (location.hash !== '#' + page) history.pushState({ page }, '', '#' + page);
+}
+window.addEventListener('popstate', e => {
+  const page = e.state?.page || location.hash.replace('#','') || 'dashboard';
+  if (STATE.session && page) {
+    STATE.page = page;
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.classList.toggle('active', el.getAttribute('onclick')?.includes(`'${page}'`));
+    });
+    renderPage(page);
+  }
+});
+
+/* ════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════ */
 function init() {
+  splashProgress(20, 'Cargando datos locales...');
   loadAllLocal();
+  splashProgress(60, 'Verificando sesion...');
+
+  // Cargar config GitHub
+  const gh = localStorage.getItem('qclab_gh');
+  if (gh) {
+    try {
+      STATE.githubCfg = JSON.parse(gh);
+    } catch {}
+  }
 
   // Restaurar sesión
   const saved = localStorage.getItem('qclab_session');
   if (saved) {
     try {
       STATE.session = JSON.parse(saved);
+      splashProgress(90, 'Restaurando sesion...');
       applySession();
+      // Navegar al hash si hay uno
+      const hashPage = location.hash.replace('#','');
+      if (hashPage && hashPage !== 'login') {
+        setTimeout(() => navigate(hashPage), 100);
+      }
+      // Sincronizar con GitHub si está configurado
+      if (STATE.githubCfg?.owner && STATE.githubCfg?.repo) {
+        splashProgress(95, 'Sincronizando...');
+        syncFromGitHub().finally(() => splashHide());
+        STATE.syncInterval = setInterval(syncFromGitHub, 60000);
+      } else {
+        splashHide();
+      }
       return;
     } catch {}
   }
 
+  splashProgress(100, '');
+  setTimeout(splashHide, 200);
+
   // Mostrar login
   document.getElementById('login-screen').classList.add('open');
-
-  // Enter en login
   document.getElementById('inp-password').addEventListener('keydown', e => {
     if (e.key === 'Enter') doLogin();
   });
@@ -4603,6 +5141,36 @@ function init() {
   });
 }
 
+/* Interceptar navigate para actualizar hash */
+const _navigateOrig = navigate;
+window.navigate = function(page) {
+  _navigateOrig(page);
+  pushHash(page);
+};
+
+/* PWA Manifest inline */
+(function() {
+  const manifest = {
+    name: 'QC Lab · Gestión de Stock',
+    short_name: 'QC Lab',
+    description: 'Sistema de gestión de stock para laboratorio QC farmacéutico',
+    start_url: location.pathname + '#dashboard',
+    display: 'standalone',
+    background_color: '#0d1117',
+    theme_color: '#0d1117',
+    orientation: 'any',
+    icons: [
+      { src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%230d1117"/><text y=".9em" font-size="80" x="10">🧪</text></svg>', sizes: '192x192', type: 'image/svg+xml' }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type:'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel = 'manifest'; link.href = url;
+  document.head.appendChild(link);
+})();
+
+splashProgress(10, 'Iniciando QC Lab...');
 init();
 </script>
 </body>
