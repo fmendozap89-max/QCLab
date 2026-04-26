@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "5b778b14-1b24-4055-a569-b1ddc4ddc639",
-      "fecha": "2026-04-26T20:59:01.759Z",
+      "id": "7758209b-b03b-43b1-913d-230e41f4ea47",
+      "fecha": "2026-04-26T20:59:17.561Z",
       "usuario": "FM",
-      "tipo": "baja",
+      "tipo": "ingreso",
       "modulo": "columnas",
-      "ref_id": "72e2fc2b-785e-420c-844a-f741efaebf71",
-      "detalle": "ELIMINADO permanentemente: Kinetex C18 150×4.6. Motivo: ok"
+      "ref_id": "274d7632-be46-4e5f-a976-a9afa77817ee",
+      "detalle": "Ingreso: Kinetex C18 150×4.6 2"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -116,8 +116,17 @@
       "modulo": "usuarios",
       "ref_id": "u1",
       "detalle": "Usuario eliminado: admin"
+    },
+    {
+      "id": "5b778b14-1b24-4055-a569-b1ddc4ddc639",
+      "fecha": "2026-04-26T20:59:01.759Z",
+      "usuario": "FM",
+      "tipo": "baja",
+      "modulo": "columnas",
+      "ref_id": "72e2fc2b-785e-420c-844a-f741efaebf71",
+      "detalle": "ELIMINADO permanentemente: Kinetex C18 150×4.6. Motivo: ok"
     }
   ],
-  "ts_mod": "2026-04-26T20:59:02.416Z",
+  "ts_mod": "2026-04-26T20:59:18.090Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
