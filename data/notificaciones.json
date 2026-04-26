@@ -8,14 +8,16 @@
       "comentario": "Propuesta consumo: abrir — Ácido clorhídrico 37% ACS | ok",
       "solicitado_por": "usuario",
       "fecha": "2026-04-26T20:07:44.282Z",
-      "estado": "pendiente",
-      "resuelto_por": null,
-      "fecha_resolucion": null,
+      "estado": "aprobada",
+      "resuelto_por": "FM",
+      "fecha_resolucion": "2026-04-26T20:08:19.889Z",
       "propuesta_consumo": {
         "tipo": "abrir",
         "cantidad": 1,
         "obs": "ok"
       }
     }
-  ]
+  ],
+  "ts_mod": "2026-04-26T20:08:22.594Z",
+  "device_mod": "dev_mog753c7_9g8zy"
 }
