@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "24af7229-d179-411e-9b36-ef6a1a0ccd59",
+      "fecha": "2026-04-26T16:36:28.398Z",
+      "usuario": "admin",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "48195d5d",
+      "detalle": "Editado: Ácido sulfúrico 98% ACS (reactivo)"
+    },
+    {
       "id": "74ebcfd5-3328-4a95-a439-adcbc06f468a",
       "fecha": "2026-04-26T16:35:23.974Z",
       "usuario": "admin",
