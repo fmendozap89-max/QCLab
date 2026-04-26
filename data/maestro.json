@@ -1,6 +1,19 @@
 {
   "articulos": [
     {
+      "id": "62601226",
+      "tipo": "insumo",
+      "descripcion": "Membrana filtro PVDF 0.22µm 47mm",
+      "codigo_erp": "INS-004",
+      "activo": true,
+      "unidad": "unid",
+      "stock_minimo": 50,
+      "aviso_val": 2,
+      "aviso_uni": "meses",
+      "aviso_meses": 2,
+      "observaciones": ""
+    },
+    {
       "id": "b268af55",
       "tipo": "reactivo",
       "descripcion": "Ácido clorhídrico 37% ACS",
@@ -436,19 +449,6 @@
       "observaciones": ""
     },
     {
-      "id": "62601226",
-      "tipo": "insumo",
-      "descripcion": "Membrana filtro PVDF 0.22µm 47mm",
-      "codigo_erp": "INS-004",
-      "activo": true,
-      "unidad": "unid",
-      "stock_minimo": 50,
-      "aviso_val": 2,
-      "aviso_uni": "meses",
-      "aviso_meses": 2,
-      "observaciones": ""
-    },
-    {
       "id": "3bd2f3b4",
       "tipo": "insumo",
       "descripcion": "Membrana filtro nylon 0.45µm 47mm",
@@ -733,5 +733,7 @@
       "observaciones": "",
       "codigo_base": "SRTFA"
     }
-  ]
+  ],
+  "ts_mod": "2026-04-26T19:50:16.150Z",
+  "device_mod": "dev_mog660xx_bgjlw"
 }
