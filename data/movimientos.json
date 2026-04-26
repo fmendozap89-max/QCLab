@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "8eb5f53d-190e-4943-9d40-8793f7322a09",
+      "fecha": "2026-04-26T17:09:00.315Z",
+      "usuario": "admin",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "37c7fbf8",
+      "detalle": "Editado: CafeÃÂÃÂ­na USP RS (estandar)"
+    },
+    {
       "id": "12771809-f21f-4cc5-b524-bae6159b40e9",
       "fecha": "2026-04-26T17:04:25.642Z",
       "usuario": "admin",
