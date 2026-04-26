@@ -11,7 +11,7 @@
       "lote": "ABC123",
       "cantidad_total": 4,
       "cantidad_en_uso": 1,
-      "cantidad_cerradas": 3,
+      "cantidad_cerradas": 2,
       "vencimiento": "2026-05-30",
       "almacenamiento": "Freezer",
       "aviso_meses": 3
