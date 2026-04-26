@@ -8,9 +8,9 @@
       "comentario": "Bajo stock: Ácido sulfúrico 98% ACS — cerradas: 2/2 x 4L",
       "solicitado_por": "admin",
       "fecha": "2026-04-26T17:11:22.498Z",
-      "estado": "pendiente",
-      "resuelto_por": null,
-      "fecha_resolucion": null
+      "estado": "aprobada",
+      "resuelto_por": "admin",
+      "fecha_resolucion": "2026-04-26T17:11:36.516Z"
     },
     {
       "id": "551860d3-9f29-46a6-b064-d0cfa1652224",
