@@ -27,7 +27,7 @@
       "lote": "L-2024-001",
       "cantidad_ingreso": 4,
       "uds_cerradas": 3,
-      "uds_en_uso": 1,
+      "uds_en_uso": 0,
       "consumos": [
         {
           "id": "485b5f67-95a4-4968-b097-83bd549dc23a",
@@ -36,6 +36,14 @@
           "cantidad": 1,
           "usuario": "admin",
           "obs": "ensayo"
+        },
+        {
+          "id": "62a68310-510b-42bb-8e19-58055a665a53",
+          "fecha": "2026-04-26T17:11:03.737Z",
+          "tipo": "agotar",
+          "cantidad": 1,
+          "usuario": "admin",
+          "obs": "se terminó"
         }
       ],
       "vencimiento": "2026-06-29"
