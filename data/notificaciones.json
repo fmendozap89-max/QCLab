@@ -1,0 +1,16 @@
+{
+  "pendientes": [
+    {
+      "id": "551860d3-9f29-46a6-b064-d0cfa1652224",
+      "tipo": "bajo_stock",
+      "modulo": "estandares",
+      "ref_id": "3f861d4d-35c9-4865-9552-75b0a940d508",
+      "comentario": "Bajo stock: CafeÃÂÃÂ­na USP RS — cerradas: 2/2 Vial x 500mg",
+      "solicitado_por": "admin",
+      "fecha": "2026-04-26T17:09:55.150Z",
+      "estado": "pendiente",
+      "resuelto_por": null,
+      "fecha_resolucion": null
+    }
+  ]
+}
