@@ -15,6 +15,21 @@
       "vencimiento": "2026-05-30",
       "almacenamiento": "Freezer",
       "aviso_meses": 3
+    },
+    {
+      "id": "e6eb0ec1-ffce-4e0f-8c91-5eef9014fcdf",
+      "estado": "activo",
+      "maestro_id": "48195d5d",
+      "fecha_ingreso": "2026-04-26",
+      "ingresado_por": "admin",
+      "comentarios": [],
+      "codigo_rc": "RC26001",
+      "lote": "L-2024-001",
+      "cantidad_ingreso": 4,
+      "uds_cerradas": 4,
+      "uds_en_uso": 0,
+      "consumos": [],
+      "vencimiento": "2026-06-29"
     }
   ]
 }
