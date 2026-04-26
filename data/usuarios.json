@@ -20,8 +20,15 @@
       "hash": "-eqjx0q",
       "display": "FM",
       "role": "gestor"
+    },
+    {
+      "id": "acc926e9-9fd8-493c-a247-cc059a37112d",
+      "username": "CS",
+      "hash": "1kjcpp",
+      "display": "CS",
+      "role": "gestor"
     }
   ],
-  "ts_mod": "2026-04-26T20:05:23.786Z",
+  "ts_mod": "2026-04-26T20:05:50.707Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
