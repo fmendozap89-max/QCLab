@@ -8,13 +8,6 @@
       "role": "gestor"
     },
     {
-      "id": "u2",
-      "username": "usuario",
-      "hash": "-vn16t8",
-      "display": "Analista",
-      "role": "usuario"
-    },
-    {
       "id": "ea40106e-b3d2-45c7-b62b-de971cf889ea",
       "username": "FM",
       "hash": "-eqjx0q",
@@ -36,6 +29,6 @@
       "role": "usuario"
     }
   ],
-  "ts_mod": "2026-04-26T20:31:13.703Z",
+  "ts_mod": "2026-04-26T20:31:20.044Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
