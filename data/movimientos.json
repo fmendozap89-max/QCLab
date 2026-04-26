@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "42d0719c-de96-4c73-a117-ea014ef56d79",
+      "fecha": "2026-04-26T17:11:03.737Z",
+      "usuario": "admin",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "e6eb0ec1-ffce-4e0f-8c91-5eef9014fcdf",
+      "detalle": "Agotada: en uso 1→0 | se terminó"
+    },
+    {
       "id": "d6be989a-e7ce-46ad-9c87-6460bb30316f",
       "fecha": "2026-04-26T17:09:22.335Z",
       "usuario": "admin",
