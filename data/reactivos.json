@@ -26,9 +26,18 @@
       "codigo_rc": "RC26001",
       "lote": "L-2024-001",
       "cantidad_ingreso": 4,
-      "uds_cerradas": 4,
-      "uds_en_uso": 0,
-      "consumos": [],
+      "uds_cerradas": 3,
+      "uds_en_uso": 1,
+      "consumos": [
+        {
+          "id": "485b5f67-95a4-4968-b097-83bd549dc23a",
+          "fecha": "2026-04-26T17:04:25.642Z",
+          "tipo": "abrir",
+          "cantidad": 1,
+          "usuario": "admin",
+          "obs": "ensayo"
+        }
+      ],
       "vencimiento": "2026-06-29"
     }
   ]
