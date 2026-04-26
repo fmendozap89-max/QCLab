@@ -1,13 +1,6 @@
 {
   "lista": [
     {
-      "id": "u1",
-      "username": "admin",
-      "hash": "-eqjx0q",
-      "display": "Administrador",
-      "role": "gestor"
-    },
-    {
       "id": "ea40106e-b3d2-45c7-b62b-de971cf889ea",
       "username": "FM",
       "hash": "-eqjx0q",
@@ -43,6 +36,6 @@
       "role": "gestor"
     }
   ],
-  "ts_mod": "2026-04-26T20:32:18.433Z",
+  "ts_mod": "2026-04-26T20:48:12.419Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
