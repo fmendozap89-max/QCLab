@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "8fdbf40f-3b2c-4b9b-9197-23cbe3aec33c",
+      "fecha": "2026-04-26T17:04:01.093Z",
+      "usuario": "admin",
+      "tipo": "ingreso",
+      "modulo": "reactivos",
+      "ref_id": "e6eb0ec1-ffce-4e0f-8c91-5eef9014fcdf",
+      "detalle": "Ingreso: Ácido sulfúrico 98% ACS RC26001"
+    },
+    {
       "id": "1bbbb013-611b-46bc-a731-db59a7daf6fa",
       "fecha": "2026-04-26T17:03:35.434Z",
       "usuario": "admin",
