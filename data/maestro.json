@@ -7,13 +7,13 @@
       "codigo_erp": "RC-001",
       "activo": true,
       "numero_cas": "7647-01-0",
-      "unidad": "L",
-      "almacenamiento": "Gabinete AC",
+      "unidad": "x 2.5L",
+      "almacenamiento": "Freezer",
       "stock_minimo": 2,
       "aviso_val": 1,
       "aviso_uni": "meses",
       "aviso_meses": 1,
-      "observaciones": ""
+      "observaciones": null
     },
     {
       "id": "48195d5d",
