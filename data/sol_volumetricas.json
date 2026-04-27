@@ -71,10 +71,18 @@
           "valor": 0.1022,
           "usuario": "FM",
           "analista": "FM"
+        },
+        {
+          "id": "b8b8aab9-3031-483a-b3b3-bbb05f13f009",
+          "fecha_titulo": "2026-04-27",
+          "vencimiento_titulo": "2026-05-04",
+          "valor": 0.1025,
+          "usuario": "FM",
+          "analista": "FM"
         }
       ]
     }
   ],
-  "ts_mod": "2026-04-27T01:11:38.007Z",
-  "device_mod": "dev_mog660xx_bgjlw"
+  "ts_mod": "2026-04-27T10:41:30.267Z",
+  "device_mod": "dev_moh2dpz4_wtzui"
 }
