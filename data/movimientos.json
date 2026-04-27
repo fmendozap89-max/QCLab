@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "2d00269c-38e1-42cf-a974-4b1e5b7e7d22",
-      "fecha": "2026-04-27T12:42:13.663Z",
+      "id": "358ebadd-320f-4fe6-812c-66080d148fbb",
+      "fecha": "2026-04-27T12:43:46.801Z",
       "usuario": "VB",
-      "tipo": "edicion",
-      "modulo": "reactivos",
-      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
-      "detalle": "Edicion de registro"
+      "tipo": "ingreso",
+      "modulo": "sol_volumetricas",
+      "ref_id": "a7d2c970-ded9-4db1-91e1-79d057a9d0b4",
+      "detalle": "Ingreso: NaOH 0.1 N SVH-C002"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -440,8 +440,17 @@
       "modulo": "reactivos",
       "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
       "detalle": "Edicion de registro"
+    },
+    {
+      "id": "2d00269c-38e1-42cf-a974-4b1e5b7e7d22",
+      "fecha": "2026-04-27T12:42:13.663Z",
+      "usuario": "VB",
+      "tipo": "edicion",
+      "modulo": "reactivos",
+      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "detalle": "Edicion de registro"
     }
   ],
-  "ts_mod": "2026-04-27T12:42:14.221Z",
+  "ts_mod": "2026-04-27T12:43:47.585Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
