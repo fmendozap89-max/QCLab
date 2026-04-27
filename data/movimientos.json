@@ -1,8 +1,8 @@
 {
   "log": [
     {
-      "id": "556ee38b-7e24-4673-b0d7-28cf16778b79",
-      "fecha": "2026-04-27T12:41:57.986Z",
+      "id": "2d00269c-38e1-42cf-a974-4b1e5b7e7d22",
+      "fecha": "2026-04-27T12:42:13.663Z",
       "usuario": "VB",
       "tipo": "edicion",
       "modulo": "reactivos",
@@ -431,8 +431,17 @@
       "modulo": "compras",
       "ref_id": "8fafd745-c960-47ad-a0b3-5e9f0c13e4e6",
       "detalle": "OC editada: 2000012"
+    },
+    {
+      "id": "556ee38b-7e24-4673-b0d7-28cf16778b79",
+      "fecha": "2026-04-27T12:41:57.986Z",
+      "usuario": "VB",
+      "tipo": "edicion",
+      "modulo": "reactivos",
+      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "detalle": "Edicion de registro"
     }
   ],
-  "ts_mod": "2026-04-27T12:41:58.691Z",
+  "ts_mod": "2026-04-27T12:42:14.221Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
