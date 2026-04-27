@@ -5723,16 +5723,15 @@ function init() {
   document.getElementById('login-screen').classList.add('open');
 
   // Poblar campos de GitHub con datos guardados
-  const gh = STATE.githubCfg;
-  if (gh?.owner) {
+  const ghCfg = STATE.githubCfg;
+  if (ghCfg?.owner) {
     const lsOwner = document.getElementById('ls-owner');
     const lsRepo  = document.getElementById('ls-repo');
     const lsToken = document.getElementById('ls-token');
-    if (lsOwner) lsOwner.value = gh.owner || '';
-    if (lsRepo)  lsRepo.value  = gh.repo  || '';
-    if (lsToken) lsToken.value = gh.token || '';
-    // Mostrar indicador de conexión activa
-    if (gh.token) {
+    if (lsOwner) lsOwner.value = ghCfg.owner || '';
+    if (lsRepo)  lsRepo.value  = ghCfg.repo  || '';
+    if (lsToken) lsToken.value = ghCfg.token || '';
+    if (ghCfg.token) {
       const ok = document.getElementById('login-sync-ok');
       if (ok) ok.style.display = 'block';
     }
