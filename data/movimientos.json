@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "24e091c8-29ee-484f-90e0-1fb97bc61f7a",
-      "fecha": "2026-04-27T12:34:57.694Z",
+      "id": "ff989fb1-3427-46d4-84d7-bcfdad53510e",
+      "fecha": "2026-04-27T12:35:16.478Z",
       "usuario": "VB",
       "tipo": "oc",
       "modulo": "compras",
       "ref_id": "8fafd745-c960-47ad-a0b3-5e9f0c13e4e6",
-      "detalle": "OC creada: 2000012"
+      "detalle": "OC editada: 2000012"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -413,8 +413,17 @@
       "modulo": "compras",
       "ref_id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
       "detalle": "OC editada: 202365"
+    },
+    {
+      "id": "24e091c8-29ee-484f-90e0-1fb97bc61f7a",
+      "fecha": "2026-04-27T12:34:57.694Z",
+      "usuario": "VB",
+      "tipo": "oc",
+      "modulo": "compras",
+      "ref_id": "8fafd745-c960-47ad-a0b3-5e9f0c13e4e6",
+      "detalle": "OC creada: 2000012"
     }
   ],
-  "ts_mod": "2026-04-27T12:34:58.269Z",
+  "ts_mod": "2026-04-27T12:35:17.106Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
