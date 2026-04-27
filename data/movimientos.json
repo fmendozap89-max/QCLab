@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "d492ad64-7756-4439-b601-a1c04107970c",
-      "fecha": "2026-04-27T11:46:26.144Z",
+      "id": "c27b41f3-a670-4b4b-afbc-5cade1e89274",
+      "fecha": "2026-04-27T11:47:04.763Z",
       "usuario": "VB",
-      "tipo": "ingreso",
-      "modulo": "sol_otras",
-      "ref_id": "9e4547da-8a7d-4b35-bee9-fb83b2e0f686",
-      "detalle": "Ingreso: Sol. Adec. Paracetamol SAPA-C025"
+      "tipo": "titulo",
+      "modulo": "sol_volumetricas",
+      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
+      "detalle": "Nuevo título: 0.1001, fecha 2026-04-27"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -350,8 +350,17 @@
       "modulo": "maestro",
       "ref_id": "06934f8c",
       "detalle": "Editado: Acetato de amonio ACS (reactivo)"
+    },
+    {
+      "id": "d492ad64-7756-4439-b601-a1c04107970c",
+      "fecha": "2026-04-27T11:46:26.144Z",
+      "usuario": "VB",
+      "tipo": "ingreso",
+      "modulo": "sol_otras",
+      "ref_id": "9e4547da-8a7d-4b35-bee9-fb83b2e0f686",
+      "detalle": "Ingreso: Sol. Adec. Paracetamol SAPA-C025"
     }
   ],
-  "ts_mod": "2026-04-27T11:46:26.647Z",
+  "ts_mod": "2026-04-27T11:47:05.279Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
