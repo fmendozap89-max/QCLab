@@ -1,6 +1,20 @@
 {
   "ordenes": [
     {
+      "id": "8fafd745-c960-47ad-a0b3-5e9f0c13e4e6",
+      "numero_oc": "2000012",
+      "tipo_articulo": "estandar",
+      "maestro_id": "f7d67e0c",
+      "descripcion_libre": "",
+      "codigo_erp": "EST-004",
+      "fecha_solicitud": "2026-04-16",
+      "fecha_entrega_estimada": "2026-04-25",
+      "fecha_recepcion": null,
+      "estado": "Aprobada",
+      "convertida_a_ingreso": false,
+      "ingreso_id": null
+    },
+    {
       "id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
       "numero_oc": "202365",
       "tipo_articulo": "columna",
@@ -15,6 +29,6 @@
       "ingreso_id": null
     }
   ],
-  "ts_mod": "2026-04-27T11:51:26.595Z",
+  "ts_mod": "2026-04-27T12:34:57.694Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
