@@ -1,31 +1,13 @@
 {
   "log": [
     {
-      "id": "61827379-e48d-4d91-9c41-e15aa2f59d41",
-      "fecha": "2026-04-27T11:51:22.988Z",
+      "id": "24e091c8-29ee-484f-90e0-1fb97bc61f7a",
+      "fecha": "2026-04-27T12:34:57.694Z",
       "usuario": "VB",
       "tipo": "oc",
       "modulo": "compras",
-      "ref_id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
-      "detalle": "OC editada: 202365"
-    },
-    {
-      "id": "25b6dd86-658c-4a0d-b404-62a4d62e354e",
-      "fecha": "2026-04-27T11:51:10.893Z",
-      "usuario": "VB",
-      "tipo": "oc",
-      "modulo": "compras",
-      "ref_id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
-      "detalle": "OC editada: 202365"
-    },
-    {
-      "id": "535b2cad-6ab1-4f87-a2e7-db087a57b2ee",
-      "fecha": "2026-04-27T11:50:58.671Z",
-      "usuario": "VB",
-      "tipo": "oc",
-      "modulo": "compras",
-      "ref_id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
-      "detalle": "OC creada: 202365"
+      "ref_id": "8fafd745-c960-47ad-a0b3-5e9f0c13e4e6",
+      "detalle": "OC creada: 2000012"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -404,8 +386,35 @@
       "modulo": "columnas",
       "ref_id": "e004e370-8493-4b67-908d-9540172412e8",
       "detalle": "Ingreso: Capcell Pak C18 250×4.6 C92"
+    },
+    {
+      "id": "535b2cad-6ab1-4f87-a2e7-db087a57b2ee",
+      "fecha": "2026-04-27T11:50:58.671Z",
+      "usuario": "VB",
+      "tipo": "oc",
+      "modulo": "compras",
+      "ref_id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
+      "detalle": "OC creada: 202365"
+    },
+    {
+      "id": "25b6dd86-658c-4a0d-b404-62a4d62e354e",
+      "fecha": "2026-04-27T11:51:10.893Z",
+      "usuario": "VB",
+      "tipo": "oc",
+      "modulo": "compras",
+      "ref_id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
+      "detalle": "OC editada: 202365"
+    },
+    {
+      "id": "61827379-e48d-4d91-9c41-e15aa2f59d41",
+      "fecha": "2026-04-27T11:51:22.988Z",
+      "usuario": "VB",
+      "tipo": "oc",
+      "modulo": "compras",
+      "ref_id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
+      "detalle": "OC editada: 202365"
     }
   ],
-  "ts_mod": "2026-04-27T11:51:23.585Z",
+  "ts_mod": "2026-04-27T12:34:58.269Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
