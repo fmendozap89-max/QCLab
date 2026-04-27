@@ -1,22 +1,13 @@
 {
   "log": [
     {
-      "id": "bfd917be-9ce5-4109-b60f-8fdab74a1d9b",
-      "fecha": "2026-04-27T11:43:42.905Z",
+      "id": "878555cb-0aa7-45e3-b894-4a3c96e077ff",
+      "fecha": "2026-04-27T11:44:09.112Z",
       "usuario": "VB",
-      "tipo": "maestro",
-      "modulo": "maestro",
-      "ref_id": "06934f8c",
-      "detalle": "Editado: Acetato de amonio ACS (reactivo)"
-    },
-    {
-      "id": "cbfbd49c-32fe-422a-bc90-b7d752de8792",
-      "fecha": "2026-04-27T11:43:03.598Z",
-      "usuario": "VB",
-      "tipo": "ingreso",
+      "tipo": "consumo",
       "modulo": "reactivos",
       "ref_id": "72da91e9-cac4-41df-bd21-96c50ff234cb",
-      "detalle": "Ingreso: Acetato de amonio ACS RC26300"
+      "detalle": "Consumo directo: 2 ud. cerradas (5→3)"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -323,8 +314,26 @@
       "modulo": "sol_volumetricas",
       "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
       "detalle": "Nuevo título: 0.1025, fecha 2026-04-27"
+    },
+    {
+      "id": "cbfbd49c-32fe-422a-bc90-b7d752de8792",
+      "fecha": "2026-04-27T11:43:03.598Z",
+      "usuario": "VB",
+      "tipo": "ingreso",
+      "modulo": "reactivos",
+      "ref_id": "72da91e9-cac4-41df-bd21-96c50ff234cb",
+      "detalle": "Ingreso: Acetato de amonio ACS RC26300"
+    },
+    {
+      "id": "bfd917be-9ce5-4109-b60f-8fdab74a1d9b",
+      "fecha": "2026-04-27T11:43:42.905Z",
+      "usuario": "VB",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "06934f8c",
+      "detalle": "Editado: Acetato de amonio ACS (reactivo)"
     }
   ],
-  "ts_mod": "2026-04-27T11:43:43.634Z",
+  "ts_mod": "2026-04-27T11:44:09.661Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
