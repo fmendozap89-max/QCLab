@@ -46,7 +46,7 @@
     },
     {
       "id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
-      "estado": "en_uso",
+      "estado": "agotada",
       "maestro_id": "abaf4e2f",
       "fecha_ingreso": "2026-04-27",
       "ingresado_por": "FM",
@@ -89,8 +89,21 @@
           "analista": "VB"
         }
       ]
+    },
+    {
+      "id": "5f690828-2362-49b4-98fe-99c0eaae9ab3",
+      "estado": "en_uso",
+      "maestro_id": "abaf4e2f",
+      "fecha_ingreso": "2026-04-27",
+      "ingresado_por": "VB",
+      "ts_mod": "2026-04-27T11:47:35.934Z",
+      "comentarios": [],
+      "codigo": "SVT-C003",
+      "fecha_prep": "2026-04-27",
+      "vencimiento": "2027-04-27",
+      "titulos": []
     }
   ],
-  "ts_mod": "2026-04-27T11:47:04.764Z",
+  "ts_mod": "2026-04-27T11:47:35.935Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
