@@ -1,5 +1,20 @@
 {
-  "ordenes": [],
-  "ts_mod": "2026-04-26T20:32:15.873Z",
-  "device_mod": "dev_mog660xx_bgjlw"
+  "ordenes": [
+    {
+      "id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
+      "numero_oc": "202365",
+      "tipo_articulo": "columna",
+      "maestro_id": "0999c63f",
+      "descripcion_libre": "",
+      "codigo_erp": "COL-004",
+      "fecha_solicitud": "2026-04-27",
+      "fecha_entrega_estimada": "2026-05-31",
+      "fecha_recepcion": null,
+      "estado": "Solicitada",
+      "convertida_a_ingreso": false,
+      "ingreso_id": null
+    }
+  ],
+  "ts_mod": "2026-04-27T11:50:58.671Z",
+  "device_mod": "dev_moh2dpz4_wtzui"
 }
