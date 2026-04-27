@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "5890ab51-4fb2-471c-af67-89634647a251",
+      "fecha": "2026-04-27T11:47:35.934Z",
+      "usuario": "VB",
+      "tipo": "ingreso",
+      "modulo": "sol_volumetricas",
+      "ref_id": "5f690828-2362-49b4-98fe-99c0eaae9ab3",
+      "detalle": "Ingreso: Na2S2O3 0.1 N SVT-C003"
+    },
+    {
       "id": "c27b41f3-a670-4b4b-afbc-5cade1e89274",
       "fecha": "2026-04-27T11:47:04.763Z",
       "usuario": "VB",
@@ -361,6 +370,6 @@
       "detalle": "Ingreso: Sol. Adec. Paracetamol SAPA-C025"
     }
   ],
-  "ts_mod": "2026-04-27T11:47:05.279Z",
+  "ts_mod": "2026-04-27T11:47:36.473Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
