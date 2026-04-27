@@ -8,9 +8,9 @@
       "comentario": "Propuesta consumo: directo (2 ud.) — Acetonitrilo HPLC grade | sadsf",
       "solicitado_por": "JH",
       "fecha": "2026-04-27T00:52:09.168Z",
-      "estado": "pendiente",
-      "resuelto_por": null,
-      "fecha_resolucion": null
+      "estado": "aprobada",
+      "resuelto_por": "FM",
+      "fecha_resolucion": "2026-04-27T00:52:26.507Z"
     },
     {
       "id": "3830a794-ea8b-4b7d-8a5f-624e00803996",
@@ -29,5 +29,7 @@
         "obs": "ok"
       }
     }
-  ]
+  ],
+  "ts_mod": "2026-04-27T00:52:26.507Z",
+  "device_mod": "dev_mog660xx_bgjlw"
 }
