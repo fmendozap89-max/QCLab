@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "a7e88090-262c-4e62-b282-233b1dbcdf5f",
-      "fecha": "2026-04-27T11:45:02.228Z",
+      "id": "d492ad64-7756-4439-b601-a1c04107970c",
+      "fecha": "2026-04-27T11:46:26.144Z",
       "usuario": "VB",
-      "tipo": "maestro",
-      "modulo": "maestro",
-      "ref_id": "06934f8c",
-      "detalle": "Editado: Acetato de amonio ACS (reactivo)"
+      "tipo": "ingreso",
+      "modulo": "sol_otras",
+      "ref_id": "9e4547da-8a7d-4b35-bee9-fb83b2e0f686",
+      "detalle": "Ingreso: Sol. Adec. Paracetamol SAPA-C025"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -341,8 +341,17 @@
       "modulo": "reactivos",
       "ref_id": "72da91e9-cac4-41df-bd21-96c50ff234cb",
       "detalle": "Consumo directo: 2 ud. cerradas (5→3)"
+    },
+    {
+      "id": "a7e88090-262c-4e62-b282-233b1dbcdf5f",
+      "fecha": "2026-04-27T11:45:02.228Z",
+      "usuario": "VB",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "06934f8c",
+      "detalle": "Editado: Acetato de amonio ACS (reactivo)"
     }
   ],
-  "ts_mod": "2026-04-27T11:45:02.847Z",
+  "ts_mod": "2026-04-27T11:46:26.647Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
