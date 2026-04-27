@@ -1,6 +1,24 @@
 {
   "log": [
     {
+      "id": "cf29e860-3b1f-4eb0-9436-81b469431892",
+      "fecha": "2026-04-27T01:08:03.829Z",
+      "usuario": "FM",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "abaf4e2f",
+      "detalle": "Editado: Na2S2O3 0.1 N (sol_volumetrica)"
+    },
+    {
+      "id": "46f2a70f-360a-4a12-9c3e-21456b41d66b",
+      "fecha": "2026-04-27T01:08:03.358Z",
+      "usuario": "FM",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "abaf4e2f",
+      "detalle": "Editado: Na2S2O3 0.1 N (sol_volumetrica)"
+    },
+    {
       "id": "e1cbaf51-3ee6-4953-a700-68533986b90d",
       "fecha": "2026-04-27T01:06:49.617Z",
       "usuario": "FM",
@@ -217,6 +235,6 @@
       "detalle": "Ingreso: Acetonitrilo HPLC grade RC26003"
     }
   ],
-  "ts_mod": "2026-04-27T01:06:50.129Z",
+  "ts_mod": "2026-04-27T01:08:04.492Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
