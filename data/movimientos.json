@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "bab32816-9ab9-41f9-adb8-3b64b2cef4d9",
-      "fecha": "2026-04-27T10:40:57.549Z",
+      "id": "118196d6-eec3-46df-9101-6818b762a119",
+      "fecha": "2026-04-27T10:41:30.266Z",
       "usuario": "FM",
-      "tipo": "ingreso",
-      "modulo": "columnas",
-      "ref_id": "145c95c0-1dd9-46f9-aa39-b14c8ecc91d6",
-      "detalle": "Ingreso: XBridge C18 150×3.0 Col1"
+      "tipo": "titulo",
+      "modulo": "sol_volumetricas",
+      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
+      "detalle": "Nuevo título: 0.1025, fecha 2026-04-27"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -296,8 +296,17 @@
       "modulo": "reactivos",
       "ref_id": "50f0a042-bdbd-4b6f-9bee-949c4d9805b4",
       "detalle": "Consumo directo: 1 ud. cerradas (6→5) | sdasd"
+    },
+    {
+      "id": "bab32816-9ab9-41f9-adb8-3b64b2cef4d9",
+      "fecha": "2026-04-27T10:40:57.549Z",
+      "usuario": "FM",
+      "tipo": "ingreso",
+      "modulo": "columnas",
+      "ref_id": "145c95c0-1dd9-46f9-aa39-b14c8ecc91d6",
+      "detalle": "Ingreso: XBridge C18 150×3.0 Col1"
     }
   ],
-  "ts_mod": "2026-04-27T10:40:58.463Z",
+  "ts_mod": "2026-04-27T10:41:30.842Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
