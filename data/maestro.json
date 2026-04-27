@@ -97,7 +97,7 @@
       "numero_cas": "631-61-8",
       "unidad": "x 500g",
       "almacenamiento": "Freezer",
-      "stock_minimo": 1,
+      "stock_minimo": 2,
       "aviso_val": 3,
       "aviso_uni": "meses",
       "aviso_meses": 3,
@@ -734,6 +734,6 @@
       "codigo_base": "SRTFA"
     }
   ],
-  "ts_mod": "2026-04-27T11:43:42.905Z",
+  "ts_mod": "2026-04-27T11:45:02.229Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
