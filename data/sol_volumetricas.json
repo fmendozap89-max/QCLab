@@ -11,9 +11,18 @@
       "codigo": "SVH-C01",
       "fecha_prep": "2026-04-27",
       "vencimiento": "2026-07-26",
-      "titulos": []
+      "titulos": [
+        {
+          "id": "d470932a-6478-43bc-a56e-6d40cf865002",
+          "fecha_titulo": "2026-04-27",
+          "vencimiento_titulo": "2026-05-27",
+          "valor": 0.111,
+          "usuario": "FM",
+          "analista": "FM"
+        }
+      ]
     }
   ],
-  "ts_mod": "2026-04-27T00:54:04.918Z",
+  "ts_mod": "2026-04-27T01:06:49.617Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
