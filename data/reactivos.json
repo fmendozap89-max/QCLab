@@ -72,12 +72,12 @@
       "maestro_id": "30463f9f",
       "fecha_ingreso": "2026-04-27",
       "ingresado_por": "FM",
-      "ts_mod": "2026-04-27T00:51:08.450Z",
+      "ts_mod": "2026-04-27T01:03:54.982Z",
       "comentarios": [],
       "codigo_rc": "RC26003",
       "lote": "3",
       "cantidad_ingreso": 8,
-      "uds_cerradas": 7,
+      "uds_cerradas": 5,
       "uds_en_uso": 1,
       "consumos": [
         {
@@ -87,11 +87,20 @@
           "cantidad": 1,
           "usuario": "FM",
           "obs": "jaskdlasd"
+        },
+        {
+          "id": "bad6a3ca-c586-492e-ac1f-e76e4228eb02",
+          "fecha": "2026-04-27T01:03:54.982Z",
+          "tipo": "directo",
+          "cantidad": 2,
+          "usuario": "JH",
+          "obs": "ok",
+          "aprobado_por": "FM"
         }
       ],
       "vencimiento": "2029-06-30"
     }
   ],
-  "ts_mod": "2026-04-27T00:51:08.450Z",
+  "ts_mod": "2026-04-27T01:03:54.983Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
