@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "878555cb-0aa7-45e3-b894-4a3c96e077ff",
-      "fecha": "2026-04-27T11:44:09.112Z",
+      "id": "a7e88090-262c-4e62-b282-233b1dbcdf5f",
+      "fecha": "2026-04-27T11:45:02.228Z",
       "usuario": "VB",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "72da91e9-cac4-41df-bd21-96c50ff234cb",
-      "detalle": "Consumo directo: 2 ud. cerradas (5→3)"
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "06934f8c",
+      "detalle": "Editado: Acetato de amonio ACS (reactivo)"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -332,8 +332,17 @@
       "modulo": "maestro",
       "ref_id": "06934f8c",
       "detalle": "Editado: Acetato de amonio ACS (reactivo)"
+    },
+    {
+      "id": "878555cb-0aa7-45e3-b894-4a3c96e077ff",
+      "fecha": "2026-04-27T11:44:09.112Z",
+      "usuario": "VB",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "72da91e9-cac4-41df-bd21-96c50ff234cb",
+      "detalle": "Consumo directo: 2 ud. cerradas (5→3)"
     }
   ],
-  "ts_mod": "2026-04-27T11:44:09.661Z",
+  "ts_mod": "2026-04-27T11:45:02.847Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
