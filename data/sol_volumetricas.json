@@ -1,5 +1,19 @@
 {
-  "registros": [],
-  "ts_mod": "2026-04-26T20:32:14.798Z",
+  "registros": [
+    {
+      "id": "a1af8d08-2d84-4bf9-9d9b-c6408a527192",
+      "estado": "en_uso",
+      "maestro_id": "7a32231c",
+      "fecha_ingreso": "2026-04-27",
+      "ingresado_por": "FM",
+      "ts_mod": "2026-04-27T00:54:04.917Z",
+      "comentarios": [],
+      "codigo": "SVH-C01",
+      "fecha_prep": "2026-04-27",
+      "vencimiento": "2026-07-26",
+      "titulos": []
+    }
+  ],
+  "ts_mod": "2026-04-27T00:54:04.918Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
