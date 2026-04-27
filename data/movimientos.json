@@ -1,22 +1,13 @@
 {
   "log": [
     {
-      "id": "5890ab51-4fb2-471c-af67-89634647a251",
-      "fecha": "2026-04-27T11:47:35.934Z",
+      "id": "acbaf574-2de3-4677-b7cd-74fa5f05039d",
+      "fecha": "2026-04-27T11:48:57.244Z",
       "usuario": "VB",
       "tipo": "ingreso",
-      "modulo": "sol_volumetricas",
-      "ref_id": "5f690828-2362-49b4-98fe-99c0eaae9ab3",
-      "detalle": "Ingreso: Na2S2O3 0.1 N SVT-C003"
-    },
-    {
-      "id": "c27b41f3-a670-4b4b-afbc-5cade1e89274",
-      "fecha": "2026-04-27T11:47:04.763Z",
-      "usuario": "VB",
-      "tipo": "titulo",
-      "modulo": "sol_volumetricas",
-      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
-      "detalle": "Nuevo título: 0.1001, fecha 2026-04-27"
+      "modulo": "columnas",
+      "ref_id": "e004e370-8493-4b67-908d-9540172412e8",
+      "detalle": "Ingreso: Capcell Pak C18 250×4.6 C92"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -368,8 +359,26 @@
       "modulo": "sol_otras",
       "ref_id": "9e4547da-8a7d-4b35-bee9-fb83b2e0f686",
       "detalle": "Ingreso: Sol. Adec. Paracetamol SAPA-C025"
+    },
+    {
+      "id": "c27b41f3-a670-4b4b-afbc-5cade1e89274",
+      "fecha": "2026-04-27T11:47:04.763Z",
+      "usuario": "VB",
+      "tipo": "titulo",
+      "modulo": "sol_volumetricas",
+      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
+      "detalle": "Nuevo título: 0.1001, fecha 2026-04-27"
+    },
+    {
+      "id": "5890ab51-4fb2-471c-af67-89634647a251",
+      "fecha": "2026-04-27T11:47:35.934Z",
+      "usuario": "VB",
+      "tipo": "ingreso",
+      "modulo": "sol_volumetricas",
+      "ref_id": "5f690828-2362-49b4-98fe-99c0eaae9ab3",
+      "detalle": "Ingreso: Na2S2O3 0.1 N SVT-C003"
     }
   ],
-  "ts_mod": "2026-04-27T11:47:36.473Z",
+  "ts_mod": "2026-04-27T11:48:57.872Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
