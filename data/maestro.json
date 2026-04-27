@@ -65,13 +65,13 @@
       "codigo_erp": "RC-004",
       "activo": true,
       "numero_cas": "75-05-8",
-      "unidad": "L",
-      "almacenamiento": "Refrigerador",
+      "unidad": "x 4L",
+      "almacenamiento": "Freezer",
       "stock_minimo": 4,
       "aviso_val": 2,
       "aviso_uni": "meses",
       "aviso_meses": 2,
-      "observaciones": ""
+      "observaciones": null
     },
     {
       "id": "0a0526a9",
@@ -734,6 +734,6 @@
       "codigo_base": "SRTFA"
     }
   ],
-  "ts_mod": "2026-04-26T20:32:11.877Z",
+  "ts_mod": "2026-04-27T00:50:46.098Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
