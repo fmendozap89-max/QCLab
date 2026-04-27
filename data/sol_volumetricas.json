@@ -79,10 +79,18 @@
           "valor": 0.1025,
           "usuario": "FM",
           "analista": "FM"
+        },
+        {
+          "id": "b9a95660-738d-40ae-bcad-bb468ff997a7",
+          "fecha_titulo": "2026-04-27",
+          "vencimiento_titulo": "2026-05-04",
+          "valor": 0.1001,
+          "usuario": "VB",
+          "analista": "VB"
         }
       ]
     }
   ],
-  "ts_mod": "2026-04-27T10:41:30.267Z",
+  "ts_mod": "2026-04-27T11:47:04.764Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
