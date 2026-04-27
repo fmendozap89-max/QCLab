@@ -2,7 +2,7 @@
   "registros": [
     {
       "id": "a1af8d08-2d84-4bf9-9d9b-c6408a527192",
-      "estado": "en_uso",
+      "estado": "agotada",
       "maestro_id": "7a32231c",
       "fecha_ingreso": "2026-04-27",
       "ingresado_por": "FM",
@@ -102,8 +102,21 @@
       "fecha_prep": "2026-04-27",
       "vencimiento": "2027-04-27",
       "titulos": []
+    },
+    {
+      "id": "a7d2c970-ded9-4db1-91e1-79d057a9d0b4",
+      "estado": "en_uso",
+      "maestro_id": "7a32231c",
+      "fecha_ingreso": "2026-04-27",
+      "ingresado_por": "VB",
+      "ts_mod": "2026-04-27T12:43:46.801Z",
+      "comentarios": [],
+      "codigo": "SVH-C002",
+      "fecha_prep": "2026-04-27",
+      "vencimiento": "2026-07-26",
+      "titulos": []
     }
   ],
-  "ts_mod": "2026-04-27T11:47:35.935Z",
+  "ts_mod": "2026-04-27T12:43:46.801Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
