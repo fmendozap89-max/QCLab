@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "ff989fb1-3427-46d4-84d7-bcfdad53510e",
-      "fecha": "2026-04-27T12:35:16.478Z",
+      "id": "556ee38b-7e24-4673-b0d7-28cf16778b79",
+      "fecha": "2026-04-27T12:41:57.986Z",
       "usuario": "VB",
-      "tipo": "oc",
-      "modulo": "compras",
-      "ref_id": "8fafd745-c960-47ad-a0b3-5e9f0c13e4e6",
-      "detalle": "OC editada: 2000012"
+      "tipo": "edicion",
+      "modulo": "reactivos",
+      "ref_id": "8e1dfc0f-76b3-4dd9-9cc7-31ac02a12be1",
+      "detalle": "Edicion de registro"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -422,8 +422,17 @@
       "modulo": "compras",
       "ref_id": "8fafd745-c960-47ad-a0b3-5e9f0c13e4e6",
       "detalle": "OC creada: 2000012"
+    },
+    {
+      "id": "ff989fb1-3427-46d4-84d7-bcfdad53510e",
+      "fecha": "2026-04-27T12:35:16.478Z",
+      "usuario": "VB",
+      "tipo": "oc",
+      "modulo": "compras",
+      "ref_id": "8fafd745-c960-47ad-a0b3-5e9f0c13e4e6",
+      "detalle": "OC editada: 2000012"
     }
   ],
-  "ts_mod": "2026-04-27T12:35:17.106Z",
+  "ts_mod": "2026-04-27T12:41:58.691Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
