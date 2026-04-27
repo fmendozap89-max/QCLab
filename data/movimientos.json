@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "78e8f603-fbe7-4c67-b45c-dda7d4e5850d",
+      "fecha": "2026-04-27T00:54:04.917Z",
+      "usuario": "FM",
+      "tipo": "ingreso",
+      "modulo": "sol_volumetricas",
+      "ref_id": "a1af8d08-2d84-4bf9-9d9b-c6408a527192",
+      "detalle": "Ingreso: NaOH 0.1 N SVH-C01"
+    },
+    {
       "id": "587aaf89-9e80-432f-94cf-10b9c17f3842",
       "fecha": "2026-04-27T00:51:08.450Z",
       "usuario": "FM",
@@ -163,6 +172,6 @@
       "detalle": "Ingreso: Acetonitrilo HPLC grade RC26003"
     }
   ],
-  "ts_mod": "2026-04-27T00:51:09.098Z",
+  "ts_mod": "2026-04-27T00:54:05.411Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
