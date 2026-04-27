@@ -65,8 +65,24 @@
       "uds_en_uso": 0,
       "consumos": [],
       "vencimiento": "2030-06-19"
+    },
+    {
+      "id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
+      "estado": "activo",
+      "maestro_id": "30463f9f",
+      "fecha_ingreso": "2026-04-27",
+      "ingresado_por": "FM",
+      "ts_mod": "2026-04-27T00:50:16.883Z",
+      "comentarios": [],
+      "codigo_rc": "RC26003",
+      "lote": "3",
+      "cantidad_ingreso": 8,
+      "uds_cerradas": 8,
+      "uds_en_uso": 0,
+      "consumos": [],
+      "vencimiento": "2029-06-30"
     }
   ],
-  "ts_mod": "2026-04-26T21:21:27.885Z",
-  "device_mod": "dev_mog9s6gi_tyng9"
+  "ts_mod": "2026-04-27T00:50:16.883Z",
+  "device_mod": "dev_mog660xx_bgjlw"
 }
