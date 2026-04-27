@@ -1,148 +1,13 @@
 {
   "log": [
     {
-      "id": "15a5df27-e833-4620-9ee1-ca257bb52103",
-      "fecha": "2026-04-27T10:40:03.612Z",
-      "usuario": "FM",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "50f0a042-bdbd-4b6f-9bee-949c4d9805b4",
-      "detalle": "Consumo directo: 1 ud. cerradas (6→5) | sdasd"
-    },
-    {
-      "id": "cfded8c4-61d8-4cf3-bf25-00c014acd9fc",
-      "fecha": "2026-04-27T01:11:38.006Z",
-      "usuario": "FM",
-      "tipo": "titulo",
-      "modulo": "sol_volumetricas",
-      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
-      "detalle": "Nuevo título: 0.1022, fecha 2026-04-28"
-    },
-    {
-      "id": "2424283b-d383-4f5c-a389-6b6d74fb0f3f",
-      "fecha": "2026-04-27T01:11:20.690Z",
-      "usuario": "FM",
-      "tipo": "titulo",
-      "modulo": "sol_volumetricas",
-      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
-      "detalle": "Nuevo título: 0.1025, fecha 2026-04-27"
-    },
-    {
-      "id": "8cb5d24d-307f-4efc-9f23-9d8b23cfc3c6",
-      "fecha": "2026-04-27T01:10:50.813Z",
+      "id": "bab32816-9ab9-41f9-adb8-3b64b2cef4d9",
+      "fecha": "2026-04-27T10:40:57.549Z",
       "usuario": "FM",
       "tipo": "ingreso",
-      "modulo": "sol_volumetricas",
-      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
-      "detalle": "Ingreso: Na2S2O3 0.1 N SVT-C02"
-    },
-    {
-      "id": "77f90986-8515-43c1-b0e0-04dfffd7f2b2",
-      "fecha": "2026-04-27T01:08:38.357Z",
-      "usuario": "FM",
-      "tipo": "titulo",
-      "modulo": "sol_volumetricas",
-      "ref_id": "dc177a51-4e80-4ec3-a0af-cdde3fd138d3",
-      "detalle": "Nuevo título: 0.0985, fecha 2026-04-27"
-    },
-    {
-      "id": "046e4c49-e214-4153-813b-fd44d4f76498",
-      "fecha": "2026-04-27T01:08:23.893Z",
-      "usuario": "FM",
-      "tipo": "ingreso",
-      "modulo": "sol_volumetricas",
-      "ref_id": "dc177a51-4e80-4ec3-a0af-cdde3fd138d3",
-      "detalle": "Ingreso: Na2S2O3 0.1 N SVT-C01"
-    },
-    {
-      "id": "cf29e860-3b1f-4eb0-9436-81b469431892",
-      "fecha": "2026-04-27T01:08:03.829Z",
-      "usuario": "FM",
-      "tipo": "maestro",
-      "modulo": "maestro",
-      "ref_id": "abaf4e2f",
-      "detalle": "Editado: Na2S2O3 0.1 N (sol_volumetrica)"
-    },
-    {
-      "id": "46f2a70f-360a-4a12-9c3e-21456b41d66b",
-      "fecha": "2026-04-27T01:08:03.358Z",
-      "usuario": "FM",
-      "tipo": "maestro",
-      "modulo": "maestro",
-      "ref_id": "abaf4e2f",
-      "detalle": "Editado: Na2S2O3 0.1 N (sol_volumetrica)"
-    },
-    {
-      "id": "e1cbaf51-3ee6-4953-a700-68533986b90d",
-      "fecha": "2026-04-27T01:06:49.617Z",
-      "usuario": "FM",
-      "tipo": "titulo",
-      "modulo": "sol_volumetricas",
-      "ref_id": "a1af8d08-2d84-4bf9-9d9b-c6408a527192",
-      "detalle": "Nuevo título: 0.1110, fecha 2026-04-27"
-    },
-    {
-      "id": "8a81970c-09bd-4106-b42d-223acadc0785",
-      "fecha": "2026-04-27T01:04:48.253Z",
-      "usuario": "FM",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
-      "detalle": "Apertura: cerradas 4→3, en uso 0→1 | pl"
-    },
-    {
-      "id": "d543bed7-974d-4eeb-be74-8eac07a547a4",
-      "fecha": "2026-04-27T01:04:35.392Z",
-      "usuario": "FM",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
-      "detalle": "Agotada: en uso 1→0"
-    },
-    {
-      "id": "bff6f60d-908d-4f4d-a2e9-e27b845a8cce",
-      "fecha": "2026-04-27T01:04:18.425Z",
-      "usuario": "FM",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
-      "detalle": "Consumo directo: 1 ud. cerradas (5→4) | 1"
-    },
-    {
-      "id": "29ffcfdc-f53b-4c4b-aeb7-d6c6c6c2586b",
-      "fecha": "2026-04-27T01:03:54.982Z",
-      "usuario": "FM",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
-      "detalle": "Consumo directo: 2 ud. cerradas (7→5) (aprobado por FM)"
-    },
-    {
-      "id": "78e8f603-fbe7-4c67-b45c-dda7d4e5850d",
-      "fecha": "2026-04-27T00:54:04.917Z",
-      "usuario": "FM",
-      "tipo": "ingreso",
-      "modulo": "sol_volumetricas",
-      "ref_id": "a1af8d08-2d84-4bf9-9d9b-c6408a527192",
-      "detalle": "Ingreso: NaOH 0.1 N SVH-C01"
-    },
-    {
-      "id": "587aaf89-9e80-432f-94cf-10b9c17f3842",
-      "fecha": "2026-04-27T00:51:08.450Z",
-      "usuario": "FM",
-      "tipo": "consumo",
-      "modulo": "reactivos",
-      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
-      "detalle": "Apertura: cerradas 8→7, en uso 0→1 | jaskdlasd"
-    },
-    {
-      "id": "393b1fc4-216d-4acd-8589-32adb73f06a3",
-      "fecha": "2026-04-27T00:50:46.098Z",
-      "usuario": "FM",
-      "tipo": "maestro",
-      "modulo": "maestro",
-      "ref_id": "30463f9f",
-      "detalle": "Editado: Acetonitrilo HPLC grade (reactivo)"
+      "modulo": "columnas",
+      "ref_id": "145c95c0-1dd9-46f9-aa39-b14c8ecc91d6",
+      "detalle": "Ingreso: XBridge C18 150×3.0 Col1"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -287,8 +152,152 @@
       "modulo": "reactivos",
       "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
       "detalle": "Ingreso: Acetonitrilo HPLC grade RC26003"
+    },
+    {
+      "id": "393b1fc4-216d-4acd-8589-32adb73f06a3",
+      "fecha": "2026-04-27T00:50:46.098Z",
+      "usuario": "FM",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "30463f9f",
+      "detalle": "Editado: Acetonitrilo HPLC grade (reactivo)"
+    },
+    {
+      "id": "587aaf89-9e80-432f-94cf-10b9c17f3842",
+      "fecha": "2026-04-27T00:51:08.450Z",
+      "usuario": "FM",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
+      "detalle": "Apertura: cerradas 8→7, en uso 0→1 | jaskdlasd"
+    },
+    {
+      "id": "78e8f603-fbe7-4c67-b45c-dda7d4e5850d",
+      "fecha": "2026-04-27T00:54:04.917Z",
+      "usuario": "FM",
+      "tipo": "ingreso",
+      "modulo": "sol_volumetricas",
+      "ref_id": "a1af8d08-2d84-4bf9-9d9b-c6408a527192",
+      "detalle": "Ingreso: NaOH 0.1 N SVH-C01"
+    },
+    {
+      "id": "29ffcfdc-f53b-4c4b-aeb7-d6c6c6c2586b",
+      "fecha": "2026-04-27T01:03:54.982Z",
+      "usuario": "FM",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
+      "detalle": "Consumo directo: 2 ud. cerradas (7→5) (aprobado por FM)"
+    },
+    {
+      "id": "bff6f60d-908d-4f4d-a2e9-e27b845a8cce",
+      "fecha": "2026-04-27T01:04:18.425Z",
+      "usuario": "FM",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
+      "detalle": "Consumo directo: 1 ud. cerradas (5→4) | 1"
+    },
+    {
+      "id": "d543bed7-974d-4eeb-be74-8eac07a547a4",
+      "fecha": "2026-04-27T01:04:35.392Z",
+      "usuario": "FM",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
+      "detalle": "Agotada: en uso 1→0"
+    },
+    {
+      "id": "8a81970c-09bd-4106-b42d-223acadc0785",
+      "fecha": "2026-04-27T01:04:48.253Z",
+      "usuario": "FM",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
+      "detalle": "Apertura: cerradas 4→3, en uso 0→1 | pl"
+    },
+    {
+      "id": "e1cbaf51-3ee6-4953-a700-68533986b90d",
+      "fecha": "2026-04-27T01:06:49.617Z",
+      "usuario": "FM",
+      "tipo": "titulo",
+      "modulo": "sol_volumetricas",
+      "ref_id": "a1af8d08-2d84-4bf9-9d9b-c6408a527192",
+      "detalle": "Nuevo título: 0.1110, fecha 2026-04-27"
+    },
+    {
+      "id": "46f2a70f-360a-4a12-9c3e-21456b41d66b",
+      "fecha": "2026-04-27T01:08:03.358Z",
+      "usuario": "FM",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "abaf4e2f",
+      "detalle": "Editado: Na2S2O3 0.1 N (sol_volumetrica)"
+    },
+    {
+      "id": "cf29e860-3b1f-4eb0-9436-81b469431892",
+      "fecha": "2026-04-27T01:08:03.829Z",
+      "usuario": "FM",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "abaf4e2f",
+      "detalle": "Editado: Na2S2O3 0.1 N (sol_volumetrica)"
+    },
+    {
+      "id": "046e4c49-e214-4153-813b-fd44d4f76498",
+      "fecha": "2026-04-27T01:08:23.893Z",
+      "usuario": "FM",
+      "tipo": "ingreso",
+      "modulo": "sol_volumetricas",
+      "ref_id": "dc177a51-4e80-4ec3-a0af-cdde3fd138d3",
+      "detalle": "Ingreso: Na2S2O3 0.1 N SVT-C01"
+    },
+    {
+      "id": "77f90986-8515-43c1-b0e0-04dfffd7f2b2",
+      "fecha": "2026-04-27T01:08:38.357Z",
+      "usuario": "FM",
+      "tipo": "titulo",
+      "modulo": "sol_volumetricas",
+      "ref_id": "dc177a51-4e80-4ec3-a0af-cdde3fd138d3",
+      "detalle": "Nuevo título: 0.0985, fecha 2026-04-27"
+    },
+    {
+      "id": "8cb5d24d-307f-4efc-9f23-9d8b23cfc3c6",
+      "fecha": "2026-04-27T01:10:50.813Z",
+      "usuario": "FM",
+      "tipo": "ingreso",
+      "modulo": "sol_volumetricas",
+      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
+      "detalle": "Ingreso: Na2S2O3 0.1 N SVT-C02"
+    },
+    {
+      "id": "2424283b-d383-4f5c-a389-6b6d74fb0f3f",
+      "fecha": "2026-04-27T01:11:20.690Z",
+      "usuario": "FM",
+      "tipo": "titulo",
+      "modulo": "sol_volumetricas",
+      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
+      "detalle": "Nuevo título: 0.1025, fecha 2026-04-27"
+    },
+    {
+      "id": "cfded8c4-61d8-4cf3-bf25-00c014acd9fc",
+      "fecha": "2026-04-27T01:11:38.006Z",
+      "usuario": "FM",
+      "tipo": "titulo",
+      "modulo": "sol_volumetricas",
+      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
+      "detalle": "Nuevo título: 0.1022, fecha 2026-04-28"
+    },
+    {
+      "id": "15a5df27-e833-4620-9ee1-ca257bb52103",
+      "fecha": "2026-04-27T10:40:03.612Z",
+      "usuario": "FM",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "50f0a042-bdbd-4b6f-9bee-949c4d9805b4",
+      "detalle": "Consumo directo: 1 ud. cerradas (6→5) | sdasd"
     }
   ],
-  "ts_mod": "2026-04-27T10:40:04.725Z",
+  "ts_mod": "2026-04-27T10:40:58.463Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
