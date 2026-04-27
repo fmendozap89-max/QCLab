@@ -132,8 +132,24 @@
         }
       ],
       "vencimiento": "2029-06-30"
+    },
+    {
+      "id": "72da91e9-cac4-41df-bd21-96c50ff234cb",
+      "estado": "activo",
+      "maestro_id": "06934f8c",
+      "fecha_ingreso": "2026-04-27",
+      "ingresado_por": "VB",
+      "ts_mod": "2026-04-27T11:43:03.598Z",
+      "comentarios": [],
+      "codigo_rc": "RC26300",
+      "lote": "1",
+      "cantidad_ingreso": 5,
+      "uds_cerradas": 5,
+      "uds_en_uso": 0,
+      "consumos": [],
+      "vencimiento": "2029-06-27"
     }
   ],
-  "ts_mod": "2026-04-27T10:40:03.613Z",
+  "ts_mod": "2026-04-27T11:43:03.598Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
