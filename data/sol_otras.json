@@ -1,5 +1,20 @@
 {
-  "registros": [],
-  "ts_mod": "2026-04-26T20:32:15.360Z",
-  "device_mod": "dev_mog660xx_bgjlw"
+  "registros": [
+    {
+      "id": "9e4547da-8a7d-4b35-bee9-fb83b2e0f686",
+      "estado": "en_uso",
+      "maestro_id": "9bdea1b9",
+      "fecha_ingreso": "2026-04-27",
+      "ingresado_por": "VB",
+      "ts_mod": "2026-04-27T11:46:26.144Z",
+      "comentarios": [],
+      "codigo": "SAPA-C025",
+      "fecha_prep": "2026-04-27",
+      "vencimiento": "2026-04-30",
+      "titulos": [],
+      "uso_adec": "Producto"
+    }
+  ],
+  "ts_mod": "2026-04-27T11:46:26.144Z",
+  "device_mod": "dev_moh2dpz4_wtzui"
 }
