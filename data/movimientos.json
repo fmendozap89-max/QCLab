@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "9144cd2e-9cc7-446f-8417-765b7452770e",
-      "fecha": "2026-04-26T21:21:27.885Z",
+      "id": "689c6f65-7894-4303-a98b-6563a89ee753",
+      "fecha": "2026-04-27T00:50:16.883Z",
       "usuario": "FM",
       "tipo": "ingreso",
       "modulo": "reactivos",
-      "ref_id": "50f0a042-bdbd-4b6f-9bee-949c4d9805b4",
-      "detalle": "Ingreso: Hidróxido de sodio puro RC26002"
+      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
+      "detalle": "Ingreso: Acetonitrilo HPLC grade RC26003"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -134,8 +134,17 @@
       "modulo": "columnas",
       "ref_id": "274d7632-be46-4e5f-a976-a9afa77817ee",
       "detalle": "Ingreso: Kinetex C18 150×4.6 2"
+    },
+    {
+      "id": "9144cd2e-9cc7-446f-8417-765b7452770e",
+      "fecha": "2026-04-26T21:21:27.885Z",
+      "usuario": "FM",
+      "tipo": "ingreso",
+      "modulo": "reactivos",
+      "ref_id": "50f0a042-bdbd-4b6f-9bee-949c4d9805b4",
+      "detalle": "Ingreso: Hidróxido de sodio puro RC26002"
     }
   ],
-  "ts_mod": "2026-04-26T21:21:28.459Z",
-  "device_mod": "dev_mog9s6gi_tyng9"
+  "ts_mod": "2026-04-27T00:50:17.824Z",
+  "device_mod": "dev_mog660xx_bgjlw"
 }
