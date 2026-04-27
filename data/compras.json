@@ -11,10 +11,10 @@
       "fecha_entrega_estimada": "2026-05-31",
       "fecha_recepcion": "2026-04-27",
       "estado": "Recibida",
-      "convertida_a_ingreso": false,
+      "convertida_a_ingreso": true,
       "ingreso_id": null
     }
   ],
-  "ts_mod": "2026-04-27T11:51:22.988Z",
+  "ts_mod": "2026-04-27T11:51:26.595Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
