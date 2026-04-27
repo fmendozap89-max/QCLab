@@ -515,10 +515,12 @@
     <div id="login-user-list" style="margin-bottom:12px">
       <div style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Usuarios</div>
       <div id="login-user-chips" style="display:flex;flex-wrap:wrap;gap:6px">
-        ${(STATE.data.usuarios?.lista || DEFAULTS.usuarios.lista).map(u =>
+        ${[...(STATE.data.usuarios?.lista || DEFAULTS.usuarios.lista)]
+          .sort((a,b)=>(a.display||a.username).localeCompare(b.display||b.username,'es'))
+          .map(u =>
           `<button onclick="loginSelectUser('${esc(u.username)}','${esc(u.role)}')"
             style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px">
-            <span style="width:6px;height:6px;border-radius:50%;background:${u.role==='gestor'?'var(--purple)':'var(--accent)'}"></span>
+            <span style="width:7px;height:7px;border-radius:50%;background:${u.role==='gestor'?'var(--red)':'var(--green)'}"></span>
             ${esc(u.display||u.username)}
           </button>`
         ).join('')}
@@ -1142,11 +1144,12 @@ function loginSelectUser(username, role) {
 function updateLoginUserChips() {
   const chips = document.getElementById('login-user-chips');
   if (!chips) return;
-  const users = STATE.data.usuarios?.lista || DEFAULTS.usuarios.lista;
+  const users = [...(STATE.data.usuarios?.lista || DEFAULTS.usuarios.lista)]
+    .sort((a,b) => (a.display||a.username).localeCompare(b.display||b.username,'es'));
   chips.innerHTML = users.map(u =>
     `<button onclick="loginSelectUser('${esc(u.username)}','${esc(u.role)}')"
       style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px">
-      <span style="width:6px;height:6px;border-radius:50%;background:${u.role==='gestor'?'var(--purple)':'var(--accent)'}"></span>
+      <span style="width:7px;height:7px;border-radius:50%;background:${u.role==='gestor'?'var(--red)':'var(--green)'}"></span>
       ${esc(u.display||u.username)}
     </button>`
   ).join('');
@@ -3296,20 +3299,24 @@ async function saveConsumo(modulo, id) {
     const cantidadDirecto = tipo === 'directo' ? (Number(gv('consumo-cantidad')) || 0) : 1;
     if (tipo === 'directo' && cantidadDirecto <= 0) { toast('Indique la cantidad a consumir', 'error'); return; }
     const propuesta = { tipo, cantidad: cantidadDirecto, obs };
-    const notifId = crearNotificacion('consumo_propuesto', modulo, id,
-      `Propuesta consumo: ${tipo}${tipo==='directo'?' ('+cantidadDirecto+' ud.)':''} — ${art?.descripcion||id}${obs?' | '+obs:''}`,
-      STATE.session?.username
-    );
-    // Adjuntar payload para ejecucion al aprobar
-    const notifs2 = STATE.data.notificaciones?.pendientes || [];
-    const notif2  = notifs2.find(n => n.id === notifId);
-    if (notif2) notif2.propuesta_consumo = propuesta;
+
+    // Crear notificacion sin publicar todavia
+    if (!STATE.data.notificaciones) STATE.data.notificaciones = { pendientes: [] };
+    const notif = {
+      id: uuid(), tipo: 'consumo_propuesto', modulo, ref_id: id,
+      comentario: `Propuesta consumo: ${tipo}${tipo==='directo'?' ('+cantidadDirecto+' ud.)':''} — ${art?.descripcion||id}${obs?' | '+obs:''}`,
+      solicitado_por: STATE.session?.username,
+      fecha: new Date().toISOString(),
+      estado: 'pendiente', resuelto_por: null, fecha_resolucion: null,
+      propuesta_consumo: propuesta   // payload adjunto ANTES de publicar
+    };
+    STATE.data.notificaciones.pendientes.unshift(notif);
+    updateNotifBadge();
 
     if (STATE.githubCfg?.token) {
-      // Con token compartido: escribir directo a GitHub
       await pushToGitHub('notificaciones');
       closeModal();
-      toast('Propuesta enviada al Gestor', 'warning');
+      toast('Propuesta enviada al Gestor para aprobacion', 'warning');
     } else {
       saveLocal('notificaciones');
       closeModal();
@@ -5235,7 +5242,8 @@ async function _doForceSyncFromRemote() {
 }
 
 function renderUsuariosConfig() {
-  const users = STATE.data.usuarios?.lista || [];
+  const users = [...(STATE.data.usuarios?.lista || [])]
+    .sort((a,b) => (a.display||a.username).localeCompare(b.display||b.username,'es'));
   return `
     <div class="table-wrap" style="margin-bottom:10px">
       <table><thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Acciones</th></tr></thead>
@@ -5726,10 +5734,17 @@ function init() {
   // Mostrar login
   document.getElementById('login-screen').classList.add('open');
 
-  // Si ya hay config GitHub guardada, mostrar indicador de conexión
+  // Si ya hay config GitHub guardada, mostrar indicador de conexión y ocultar el panel
   if (STATE.githubCfg?.owner && STATE.githubCfg?.token) {
     const ok = document.getElementById('login-sync-ok');
     if (ok) ok.style.display = 'block';
+    // Precargar campos por si el usuario quiere ver/editar
+    const lsOwner = document.getElementById('ls-owner');
+    const lsRepo  = document.getElementById('ls-repo');
+    const lsToken = document.getElementById('ls-token');
+    if (lsOwner) lsOwner.value = STATE.githubCfg.owner || '';
+    if (lsRepo)  lsRepo.value  = STATE.githubCfg.repo  || '';
+    if (lsToken) lsToken.value = STATE.githubCfg.token || '';
   }
 
   document.getElementById('inp-password').addEventListener('keydown', e => {
