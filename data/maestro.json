@@ -95,13 +95,13 @@
       "codigo_erp": "RC-006",
       "activo": true,
       "numero_cas": "631-61-8",
-      "unidad": "g",
-      "almacenamiento": "Temperatura ambiente",
-      "stock_minimo": 500,
-      "aviso_val": 1,
+      "unidad": "x 500g",
+      "almacenamiento": "Freezer",
+      "stock_minimo": 1,
+      "aviso_val": 3,
       "aviso_uni": "meses",
-      "aviso_meses": 1,
-      "observaciones": ""
+      "aviso_meses": 3,
+      "observaciones": null
     },
     {
       "id": "5dc78b38",
@@ -733,5 +733,7 @@
       "observaciones": "",
       "codigo_base": "SRTFA"
     }
-  ]
+  ],
+  "ts_mod": "2026-04-27T11:43:42.905Z",
+  "device_mod": "dev_moh2dpz4_wtzui"
 }
