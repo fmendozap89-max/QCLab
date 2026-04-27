@@ -473,7 +473,7 @@
       <div><div class="logo-text">QC Lab Stock</div><div class="logo-sub">Gestión de Laboratorio</div></div>
     </div>
 
-    <!-- Panel de sincronización — visible antes de autenticarse -->
+    <!-- Panel de sincronización -->
     <div id="login-sync-panel" style="margin-bottom:20px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
       <button onclick="toggleLoginSync()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border:none;color:var(--text);cursor:pointer;font-size:12px;font-weight:600">
         <span>⚙️ Configurar sincronización GitHub</span>
@@ -484,18 +484,15 @@
         <div style="display:flex;flex-direction:column;gap:8px">
           <div class="form-group">
             <label>Usuario/Org de GitHub</label>
-            <input type="text" id="ls-owner" placeholder="nombre-usuario-github"
-              value="${localStorage.getItem('qclab_gh') ? JSON.parse(localStorage.getItem('qclab_gh')).owner||'' : ''}">
+            <input type="text" id="ls-owner" placeholder="nombre-usuario-github">
           </div>
           <div class="form-group">
             <label>Repositorio</label>
-            <input type="text" id="ls-repo" placeholder="qclab-data"
-              value="${localStorage.getItem('qclab_gh') ? JSON.parse(localStorage.getItem('qclab_gh')).repo||'' : ''}">
+            <input type="text" id="ls-repo" placeholder="qclab-data">
           </div>
           <div class="form-group">
             <label>Token (PAT)</label>
-            <input type="password" id="ls-token" placeholder="ghp_..."
-              value="${localStorage.getItem('qclab_gh') ? JSON.parse(localStorage.getItem('qclab_gh')).token||'' : ''}">
+            <input type="password" id="ls-token" placeholder="ghp_...">
           </div>
           <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="loginSyncGuardar()">
             Guardar y sincronizar
@@ -503,7 +500,8 @@
         </div>
       </div>
     </div>
-    <!-- Estado de sync compacto cuando está configurado -->
+
+    <!-- Indicador de conexión activa -->
     <div id="login-sync-ok" style="display:none;margin-bottom:14px;font-size:11px;color:var(--green);padding:7px 10px;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.2);border-radius:var(--r)">
       ✔ Conectado a GitHub — usuarios sincronizados
     </div>
@@ -511,20 +509,10 @@
     <div class="login-title">Iniciar Sesión</div>
     <div class="login-sub">Ingrese sus credenciales para continuar</div>
 
-    <!-- Lista de usuarios disponibles -->
+    <!-- Lista de usuarios — poblada dinámicamente por JS -->
     <div id="login-user-list" style="margin-bottom:12px">
       <div style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Usuarios</div>
-      <div id="login-user-chips" style="display:flex;flex-wrap:wrap;gap:6px">
-        ${[...(STATE.data.usuarios?.lista || DEFAULTS.usuarios.lista)]
-          .sort((a,b)=>(a.display||a.username).localeCompare(b.display||b.username,'es'))
-          .map(u =>
-          `<button onclick="loginSelectUser('${esc(u.username)}','${esc(u.role)}')"
-            style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px">
-            <span style="width:7px;height:7px;border-radius:50%;background:${u.role==='gestor'?'var(--red)':'var(--green)'}"></span>
-            ${esc(u.display||u.username)}
-          </button>`
-        ).join('')}
-      </div>
+      <div id="login-user-chips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
 
     <div class="form-group" style="margin-bottom:10px">
@@ -5734,18 +5722,24 @@ function init() {
   // Mostrar login
   document.getElementById('login-screen').classList.add('open');
 
-  // Si ya hay config GitHub guardada, mostrar indicador de conexión y ocultar el panel
-  if (STATE.githubCfg?.owner && STATE.githubCfg?.token) {
-    const ok = document.getElementById('login-sync-ok');
-    if (ok) ok.style.display = 'block';
-    // Precargar campos por si el usuario quiere ver/editar
+  // Poblar campos de GitHub con datos guardados
+  const gh = STATE.githubCfg;
+  if (gh?.owner) {
     const lsOwner = document.getElementById('ls-owner');
     const lsRepo  = document.getElementById('ls-repo');
     const lsToken = document.getElementById('ls-token');
-    if (lsOwner) lsOwner.value = STATE.githubCfg.owner || '';
-    if (lsRepo)  lsRepo.value  = STATE.githubCfg.repo  || '';
-    if (lsToken) lsToken.value = STATE.githubCfg.token || '';
+    if (lsOwner) lsOwner.value = gh.owner || '';
+    if (lsRepo)  lsRepo.value  = gh.repo  || '';
+    if (lsToken) lsToken.value = gh.token || '';
+    // Mostrar indicador de conexión activa
+    if (gh.token) {
+      const ok = document.getElementById('login-sync-ok');
+      if (ok) ok.style.display = 'block';
+    }
   }
+
+  // Poblar chips de usuarios
+  updateLoginUserChips();
 
   document.getElementById('inp-password').addEventListener('keydown', e => {
     if (e.key === 'Enter') doLogin();
