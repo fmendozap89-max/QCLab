@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "61827379-e48d-4d91-9c41-e15aa2f59d41",
+      "fecha": "2026-04-27T11:51:22.988Z",
+      "usuario": "VB",
+      "tipo": "oc",
+      "modulo": "compras",
+      "ref_id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
+      "detalle": "OC editada: 202365"
+    },
+    {
       "id": "25b6dd86-658c-4a0d-b404-62a4d62e354e",
       "fecha": "2026-04-27T11:51:10.893Z",
       "usuario": "VB",
@@ -397,6 +406,6 @@
       "detalle": "Ingreso: Capcell Pak C18 250×4.6 C92"
     }
   ],
-  "ts_mod": "2026-04-27T11:51:11.469Z",
+  "ts_mod": "2026-04-27T11:51:23.585Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
