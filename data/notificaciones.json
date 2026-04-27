@@ -1,6 +1,18 @@
 {
   "pendientes": [
     {
+      "id": "021f4530-036a-4026-8a7c-ed3ec4219bd9",
+      "tipo": "consumo_propuesto",
+      "modulo": "reactivos",
+      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
+      "comentario": "Propuesta consumo: directo (2 ud.) — Acetonitrilo HPLC grade | sadsf",
+      "solicitado_por": "JH",
+      "fecha": "2026-04-27T00:52:09.168Z",
+      "estado": "pendiente",
+      "resuelto_por": null,
+      "fecha_resolucion": null
+    },
+    {
       "id": "3830a794-ea8b-4b7d-8a5f-624e00803996",
       "tipo": "consumo_propuesto",
       "modulo": "reactivos",
@@ -18,6 +30,6 @@
       }
     }
   ],
-  "ts_mod": "2026-04-26T20:32:17.202Z",
+  "ts_mod": "2026-04-27T00:52:09.169Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
