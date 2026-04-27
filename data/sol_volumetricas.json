@@ -24,7 +24,7 @@
     },
     {
       "id": "dc177a51-4e80-4ec3-a0af-cdde3fd138d3",
-      "estado": "en_uso",
+      "estado": "agotada",
       "maestro_id": "abaf4e2f",
       "fecha_ingreso": "2026-04-27",
       "ingresado_por": "FM",
@@ -43,8 +43,21 @@
           "analista": "FM"
         }
       ]
+    },
+    {
+      "id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
+      "estado": "en_uso",
+      "maestro_id": "abaf4e2f",
+      "fecha_ingreso": "2026-04-27",
+      "ingresado_por": "FM",
+      "ts_mod": "2026-04-27T01:10:50.813Z",
+      "comentarios": [],
+      "codigo": "SVT-C02",
+      "fecha_prep": "2026-04-27",
+      "vencimiento": "2027-04-27",
+      "titulos": []
     }
   ],
-  "ts_mod": "2026-04-27T01:08:38.357Z",
+  "ts_mod": "2026-04-27T01:10:50.813Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
