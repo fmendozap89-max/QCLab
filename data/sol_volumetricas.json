@@ -55,9 +55,18 @@
       "codigo": "SVT-C02",
       "fecha_prep": "2026-04-27",
       "vencimiento": "2027-04-27",
-      "titulos": []
+      "titulos": [
+        {
+          "id": "ffcc852a-79d7-4f6d-b0f2-51985690417d",
+          "fecha_titulo": "2026-04-27",
+          "vencimiento_titulo": "2026-05-04",
+          "valor": 0.1025,
+          "usuario": "FM",
+          "analista": "FM"
+        }
+      ]
     }
   ],
-  "ts_mod": "2026-04-27T01:10:50.813Z",
+  "ts_mod": "2026-04-27T01:11:20.691Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
