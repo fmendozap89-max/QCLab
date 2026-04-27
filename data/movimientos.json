@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "acbaf574-2de3-4677-b7cd-74fa5f05039d",
-      "fecha": "2026-04-27T11:48:57.244Z",
+      "id": "535b2cad-6ab1-4f87-a2e7-db087a57b2ee",
+      "fecha": "2026-04-27T11:50:58.671Z",
       "usuario": "VB",
-      "tipo": "ingreso",
-      "modulo": "columnas",
-      "ref_id": "e004e370-8493-4b67-908d-9540172412e8",
-      "detalle": "Ingreso: Capcell Pak C18 250×4.6 C92"
+      "tipo": "oc",
+      "modulo": "compras",
+      "ref_id": "10267be8-2248-4837-b1ec-f6ff02b5f0c0",
+      "detalle": "OC creada: 202365"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -377,8 +377,17 @@
       "modulo": "sol_volumetricas",
       "ref_id": "5f690828-2362-49b4-98fe-99c0eaae9ab3",
       "detalle": "Ingreso: Na2S2O3 0.1 N SVT-C003"
+    },
+    {
+      "id": "acbaf574-2de3-4677-b7cd-74fa5f05039d",
+      "fecha": "2026-04-27T11:48:57.244Z",
+      "usuario": "VB",
+      "tipo": "ingreso",
+      "modulo": "columnas",
+      "ref_id": "e004e370-8493-4b67-908d-9540172412e8",
+      "detalle": "Ingreso: Capcell Pak C18 250×4.6 C92"
     }
   ],
-  "ts_mod": "2026-04-27T11:48:57.872Z",
+  "ts_mod": "2026-04-27T11:50:59.378Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
