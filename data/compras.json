@@ -11,7 +11,7 @@
       "fecha_entrega_estimada": "2026-04-25",
       "fecha_recepcion": "2026-04-27",
       "estado": "Recibida",
-      "convertida_a_ingreso": false,
+      "convertida_a_ingreso": true,
       "ingreso_id": null
     },
     {
@@ -29,6 +29,6 @@
       "ingreso_id": null
     }
   ],
-  "ts_mod": "2026-04-27T12:35:16.478Z",
+  "ts_mod": "2026-04-27T12:35:20.663Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
