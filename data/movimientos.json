@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "8a81970c-09bd-4106-b42d-223acadc0785",
+      "fecha": "2026-04-27T01:04:48.253Z",
+      "usuario": "FM",
+      "tipo": "consumo",
+      "modulo": "reactivos",
+      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
+      "detalle": "Apertura: cerradas 4→3, en uso 0→1 | pl"
+    },
+    {
       "id": "d543bed7-974d-4eeb-be74-8eac07a547a4",
       "fecha": "2026-04-27T01:04:35.392Z",
       "usuario": "FM",
@@ -199,6 +208,6 @@
       "detalle": "Ingreso: Acetonitrilo HPLC grade RC26003"
     }
   ],
-  "ts_mod": "2026-04-27T01:04:36.102Z",
+  "ts_mod": "2026-04-27T01:04:48.902Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
