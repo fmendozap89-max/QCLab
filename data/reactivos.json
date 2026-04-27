@@ -139,17 +139,26 @@
       "maestro_id": "06934f8c",
       "fecha_ingreso": "2026-04-27",
       "ingresado_por": "VB",
-      "ts_mod": "2026-04-27T11:43:03.598Z",
+      "ts_mod": "2026-04-27T11:44:09.112Z",
       "comentarios": [],
       "codigo_rc": "RC26300",
       "lote": "1",
       "cantidad_ingreso": 5,
-      "uds_cerradas": 5,
+      "uds_cerradas": 3,
       "uds_en_uso": 0,
-      "consumos": [],
+      "consumos": [
+        {
+          "id": "75a1350d-7cdb-40d5-a909-055da1ae1c1a",
+          "fecha": "2026-04-27T11:44:09.112Z",
+          "tipo": "directo",
+          "cantidad": 2,
+          "usuario": "VB",
+          "obs": ""
+        }
+      ],
       "vencimiento": "2029-06-27"
     }
   ],
-  "ts_mod": "2026-04-27T11:43:03.598Z",
+  "ts_mod": "2026-04-27T11:44:09.112Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
