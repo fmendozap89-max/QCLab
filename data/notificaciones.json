@@ -1,6 +1,23 @@
 {
   "pendientes": [
     {
+      "id": "30fb410b-a999-4929-b756-eb2048f1dea5",
+      "tipo": "consumo_propuesto",
+      "modulo": "reactivos",
+      "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
+      "comentario": "Propuesta consumo: directo (2 ud.) — Acetonitrilo HPLC grade | ok",
+      "solicitado_por": "JH",
+      "fecha": "2026-04-27T01:03:39.280Z",
+      "estado": "pendiente",
+      "resuelto_por": null,
+      "fecha_resolucion": null,
+      "propuesta_consumo": {
+        "tipo": "directo",
+        "cantidad": 2,
+        "obs": "ok"
+      }
+    },
+    {
       "id": "021f4530-036a-4026-8a7c-ed3ec4219bd9",
       "tipo": "consumo_propuesto",
       "modulo": "reactivos",
@@ -30,6 +47,6 @@
       }
     }
   ],
-  "ts_mod": "2026-04-27T00:52:26.507Z",
+  "ts_mod": "2026-04-27T01:03:39.280Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
