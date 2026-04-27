@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "2424283b-d383-4f5c-a389-6b6d74fb0f3f",
+      "fecha": "2026-04-27T01:11:20.690Z",
+      "usuario": "FM",
+      "tipo": "titulo",
+      "modulo": "sol_volumetricas",
+      "ref_id": "6564a227-dd12-4a75-8a0a-cff7d7b00934",
+      "detalle": "Nuevo título: 0.1025, fecha 2026-04-27"
+    },
+    {
       "id": "8cb5d24d-307f-4efc-9f23-9d8b23cfc3c6",
       "fecha": "2026-04-27T01:10:50.813Z",
       "usuario": "FM",
@@ -262,6 +271,6 @@
       "detalle": "Ingreso: Acetonitrilo HPLC grade RC26003"
     }
   ],
-  "ts_mod": "2026-04-27T01:10:51.537Z",
+  "ts_mod": "2026-04-27T01:11:21.232Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
