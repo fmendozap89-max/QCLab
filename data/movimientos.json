@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "bfd917be-9ce5-4109-b60f-8fdab74a1d9b",
+      "fecha": "2026-04-27T11:43:42.905Z",
+      "usuario": "VB",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "06934f8c",
+      "detalle": "Editado: Acetato de amonio ACS (reactivo)"
+    },
+    {
       "id": "cbfbd49c-32fe-422a-bc90-b7d752de8792",
       "fecha": "2026-04-27T11:43:03.598Z",
       "usuario": "VB",
@@ -316,6 +325,6 @@
       "detalle": "Nuevo título: 0.1025, fecha 2026-04-27"
     }
   ],
-  "ts_mod": "2026-04-27T11:43:04.096Z",
+  "ts_mod": "2026-04-27T11:43:43.634Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
