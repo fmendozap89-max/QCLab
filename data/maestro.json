@@ -599,16 +599,16 @@
       "tipo": "sol_volumetrica",
       "descripcion": "Na2S2O3 0.1 N",
       "activo": true,
-      "validez_prep_val": 30,
-      "validez_prep_uni": "días",
-      "validez_prep_dias": 30,
-      "validez_tit_val": 14,
-      "validez_tit_uni": "días",
-      "validez_tit_dias": 14,
-      "aviso_val": 1,
-      "aviso_uni": "semanas",
-      "aviso_meses": 0.23,
-      "observaciones": "",
+      "validez_prep_val": 12,
+      "validez_prep_uni": "meses",
+      "validez_prep_dias": 365,
+      "validez_tit_val": 1,
+      "validez_tit_uni": "semanas",
+      "validez_tit_dias": 7,
+      "aviso_val": 2,
+      "aviso_uni": "dias",
+      "aviso_meses": 0.06578947368421052,
+      "observaciones": null,
       "codigo_base": "SVT"
     },
     {
@@ -734,6 +734,6 @@
       "codigo_base": "SRTFA"
     }
   ],
-  "ts_mod": "2026-04-27T00:50:46.098Z",
+  "ts_mod": "2026-04-27T01:08:03.358Z",
   "device_mod": "dev_mog660xx_bgjlw"
 }
