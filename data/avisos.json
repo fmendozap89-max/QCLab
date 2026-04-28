@@ -7,9 +7,9 @@
       "ref_id": "0bd68c6b-ad20-47dd-8059-9c701e34e599",
       "detalle": "Bajo stock: Acetonitrilo HPLC grade — cerradas: 3/4 x 4L",
       "fecha": "2026-04-27T01:04:48.252Z",
-      "oculto": false,
-      "ocultado_por": null,
-      "fecha_ocultado": null
+      "oculto": true,
+      "ocultado_por": "VB",
+      "fecha_ocultado": "2026-04-28T11:56:32.018Z"
     },
     {
       "id": "fd0e9090-abd4-4a3c-933a-7c98e12cdba3",
@@ -22,5 +22,7 @@
       "ocultado_por": "FM",
       "fecha_ocultado": "2026-04-26T21:20:48.249Z"
     }
-  ]
+  ],
+  "ts_mod": "2026-04-28T11:56:32.019Z",
+  "device_mod": "dev_moh2dpz4_wtzui"
 }
