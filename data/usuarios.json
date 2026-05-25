@@ -43,13 +43,6 @@
       "role": "gestor"
     },
     {
-      "id": "dc78d23b-7c4e-48cc-98e8-e70948f533b3",
-      "username": "VR",
-      "hash": "-eqjx0q",
-      "display": "VR",
-      "role": "usuario"
-    },
-    {
       "id": "41ae1620-fca4-41eb-b7d2-d0b0f5ed38d2",
       "username": "PlantaB",
       "hash": "1rdtnf",
@@ -57,6 +50,6 @@
       "role": "usuario"
     }
   ],
-  "ts_mod": "2026-05-25T01:27:46.961Z",
+  "ts_mod": "2026-05-25T01:28:22.449Z",
   "device_mod": "dev_mpkipilj_u3s1f"
 }
