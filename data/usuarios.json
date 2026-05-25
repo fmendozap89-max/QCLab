@@ -55,8 +55,15 @@
       "hash": "-eqjx0q",
       "display": "VR",
       "role": "gestor"
+    },
+    {
+      "id": "e14eb1bb-ead1-4411-87a9-b9745c8c36f3",
+      "username": "AL",
+      "hash": "1jbama",
+      "display": "AL",
+      "role": "usuario"
     }
   ],
-  "ts_mod": "2026-05-25T01:28:42.569Z",
+  "ts_mod": "2026-05-25T01:29:05.128Z",
   "device_mod": "dev_mpkipilj_u3s1f"
 }
