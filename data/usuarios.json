@@ -48,8 +48,15 @@
       "hash": "1rdtnf",
       "display": "PlantaB",
       "role": "usuario"
+    },
+    {
+      "id": "1d323fc6-c615-4cb2-8cd7-71c78b8be463",
+      "username": "VR",
+      "hash": "-eqjx0q",
+      "display": "VR",
+      "role": "gestor"
     }
   ],
-  "ts_mod": "2026-05-25T01:28:22.449Z",
+  "ts_mod": "2026-05-25T01:28:42.569Z",
   "device_mod": "dev_mpkipilj_u3s1f"
 }
