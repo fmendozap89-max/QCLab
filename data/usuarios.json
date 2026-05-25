@@ -43,27 +43,21 @@
       "role": "gestor"
     },
     {
+      "id": "dc78d23b-7c4e-48cc-98e8-e70948f533b3",
+      "username": "VR",
+      "hash": "1uyt01",
+      "display": "VR",
+      "role": "gestor",
+      "ts_mod": "2026-05-25T02:00:18.322Z"
+    },
+    {
       "id": "41ae1620-fca4-41eb-b7d2-d0b0f5ed38d2",
       "username": "PlantaB",
       "hash": "1rdtnf",
       "display": "PlantaB",
       "role": "usuario"
-    },
-    {
-      "id": "1d323fc6-c615-4cb2-8cd7-71c78b8be463",
-      "username": "VR",
-      "hash": "-eqjx0q",
-      "display": "VR",
-      "role": "gestor"
-    },
-    {
-      "id": "e14eb1bb-ead1-4411-87a9-b9745c8c36f3",
-      "username": "AL",
-      "hash": "1jbama",
-      "display": "AL",
-      "role": "usuario"
     }
   ],
-  "ts_mod": "2026-05-25T01:29:05.128Z",
-  "device_mod": "dev_mpkipilj_u3s1f"
+  "ts_mod": "2026-05-25T02:00:18.322Z",
+  "device_mod": "dev_mpkhvqjm_gps41"
 }
