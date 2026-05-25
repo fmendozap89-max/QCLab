@@ -1,13 +1,13 @@
 {
   "log": [
     {
-      "id": "653aecc5-59e0-42fb-93a0-1be5cfbb2632",
-      "fecha": "2026-04-27T12:44:10.684Z",
-      "usuario": "VB",
-      "tipo": "titulo",
-      "modulo": "sol_volumetricas",
-      "ref_id": "a7d2c970-ded9-4db1-91e1-79d057a9d0b4",
-      "detalle": "Nuevo título: 0.1025, fecha 2026-04-27"
+      "id": "857a5726-ad9d-4e06-8b9f-9375456e05a0",
+      "fecha": "2026-05-25T01:28:23.128Z",
+      "usuario": "FM",
+      "tipo": "edicion",
+      "modulo": "usuarios",
+      "ref_id": "dc78d23b-7c4e-48cc-98e8-e70948f533b3",
+      "detalle": "Usuario eliminado: VR"
     },
     {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
@@ -458,8 +458,17 @@
       "modulo": "sol_volumetricas",
       "ref_id": "a7d2c970-ded9-4db1-91e1-79d057a9d0b4",
       "detalle": "Ingreso: NaOH 0.1 N SVH-C002"
+    },
+    {
+      "id": "653aecc5-59e0-42fb-93a0-1be5cfbb2632",
+      "fecha": "2026-04-27T12:44:10.684Z",
+      "usuario": "VB",
+      "tipo": "titulo",
+      "modulo": "sol_volumetricas",
+      "ref_id": "a7d2c970-ded9-4db1-91e1-79d057a9d0b4",
+      "detalle": "Nuevo título: 0.1025, fecha 2026-04-27"
     }
   ],
-  "ts_mod": "2026-04-27T12:44:11.373Z",
-  "device_mod": "dev_moh2dpz4_wtzui"
+  "ts_mod": "2026-05-25T01:28:23.128Z",
+  "device_mod": "dev_mpkipilj_u3s1f"
 }
