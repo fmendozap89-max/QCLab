@@ -1291,7 +1291,8 @@ function applySession() {
   document.getElementById('user-avatar').textContent = STATE.session.display[0].toUpperCase();
   document.getElementById('user-name-display').textContent = STATE.session.display;
   document.getElementById('user-role-display').textContent = STATE.session.role === 'gestor' ? 'Gestor' : 'Usuario';
-  if (!isGestor()) document.getElementById('nav-admin-section').style.display = 'none';
+  const adminSection = document.getElementById('nav-admin-section');
+  if (adminSection) adminSection.style.display = isGestor() ? '' : 'none';
   updateNotifBadge();
   updateAvisosBadge();
   navigate('dashboard');
@@ -1769,6 +1770,8 @@ function renderStockModule(modulo) {
         <button class="copy-table-btn" onclick="copyTableToClipboard('tbl-${modulo}')">📋 Copiar tabla</button>
         <button class="btn btn-secondary btn-sm" onclick="exportToExcel('${modulo}')">⬇ Excel</button>
         ${isGestor() ? `<button class="btn btn-secondary btn-sm" onclick="openImportModal('${modulo}')">📤 Importar</button>` : ''}
+        ${isGestor() && modulo === 'sol_volumetricas' ? `<button class="btn btn-secondary btn-sm" onclick="openImportHistoricoSolVolModal()" title="Cargar preparaciones y titulos previos a la implementacion">📜 Importar Histórico</button>` : ''}
+        ${isGestor() && modulo === 'sol_otras' ? `<button class="btn btn-secondary btn-sm" onclick="openImportHistoricoSolOtrasModal()" title="Cargar preparaciones previas a la implementacion">📜 Importar Histórico</button>` : ''}
         ${canAddDirect ? `<button class="btn btn-primary btn-sm" onclick="openAddModal('${modulo}')">+ ${cfg.addLabel}</button>` : ''}
         ${canRequestSolucion ? `<button class="btn btn-primary btn-sm" onclick="solicitarCreacionSolucion('${modulo}')">+ Solicitar Solucion</button>` : ''}
       </div>
@@ -2745,6 +2748,10 @@ function buildIngresoForm(modulo, reg) {
       <label>Articulo (Maestro)<span class="form-req">*</span></label>${artSel}</div>
     ${infoBox}
     ${extra}
+    <div class="form-group">
+      <label>Fecha de ingreso al sistema</label>
+      <input type="date" id="f-fecha_ingreso" value="${reg.fecha_ingreso || today()}">
+      <span class="form-hint">Para cargas retroactivas. Default: hoy.</span></div>
     <div class="form-group" style="grid-column:1/-1">
       <label>Comentario inicial</label>
       <textarea id="f-comentario_inicial">${esc(reg.comentario_inicial||'')}</textarea></div>
@@ -2805,7 +2812,8 @@ async function saveNew(modulo) {
 
   const reg = {
     id: uuid(), estado: 'activo', maestro_id: mid,
-    fecha_ingreso: today(), ingresado_por: STATE.session?.username,
+    fecha_ingreso: gv('f-fecha_ingreso') || today(),
+    ingresado_por: STATE.session?.username,
     ts_mod: new Date().toISOString(),
     comentarios: []
   };
@@ -2957,10 +2965,10 @@ function openEditModal(modulo, id) {
   setTimeout(() => {
     // Campos propios según módulo — NUNCA campos del Maestro
     const camposPropios = {
-      estandares:      ['categoria','lote','cantidad_ingreso','uds_cerradas','vencimiento'],
-      columnas:        ['codigo_interno','lote_serie','uso','uso_dedicado','estado_uso','puesta_en_uso'],
-      sol_volumetricas:['codigo','fecha_prep','vencimiento'],
-      sol_otras:       ['codigo','fecha_prep','vencimiento','uso_adec'],
+      estandares:      ['categoria','lote','cantidad_ingreso','uds_cerradas','vencimiento','fecha_ingreso'],
+      columnas:        ['codigo_interno','lote_serie','uso','uso_dedicado','estado_uso','puesta_en_uso','fecha_ingreso'],
+      sol_volumetricas:['codigo','fecha_prep','vencimiento','fecha_ingreso'],
+      sol_otras:       ['codigo','fecha_prep','vencimiento','uso_adec','fecha_ingreso'],
     };
     for (const f of (camposPropios[modulo]||[])) {
       const el = document.getElementById('f-' + f) || document.getElementById('f-' + f.replace('_prep','_preparacion'));
@@ -2981,6 +2989,10 @@ async function saveEdit(modulo, id) {
   const idx = registros.findIndex(r=>r.id===id);
   if (idx < 0) return;
   const r = registros[idx];
+
+  // Comun a todos los modulos: fecha de ingreso editable (para correcciones retroactivas)
+  const fi = gv('f-fecha_ingreso');
+  if (fi) r.fecha_ingreso = fi;
 
   // Solo guardar campos propios del ingreso — NUNCA sobreescribir datos del Maestro
   if (modulo === 'estandares') {
@@ -4067,6 +4079,640 @@ function filterMaestroTipo(tipo) {
 function renderMaestro() { return renderMaestroTab('estandares'); } // legacy compat
 
 /* ════════════════════════════════════════════════════════════
+   IMPORTACION HISTORICA — SOL. VOLUMETRICAS
+   ── Para cargar preparaciones previas a la implementacion del sistema,
+   junto con sus titulos historicos. Solo Gestor.
+════════════════════════════════════════════════════════════ */
+
+function descargarPlantillaHistoricoSolVol() {
+  if (!window.XLSX) { toast('Libreria XLSX no disponible', 'error'); return; }
+  const wb = XLSX.utils.book_new();
+
+  // Hoja Preparaciones
+  const hdrPreps = ['codigo','fecha_prep','vencimiento','estado','ingresado_por','fecha_ingreso','observaciones'];
+  const ejPreps = [
+    ['SVH-C01','2024-03-15','2024-09-15','agotada','jperez','2024-03-15','Preparada para titulacion HCl'],
+    ['SVH-C02','2024-09-10','2025-03-10','en_uso','mlopez','2024-09-10','']
+  ];
+  const wsPreps = XLSX.utils.aoa_to_sheet([hdrPreps, ...ejPreps]);
+  wsPreps['!cols'] = hdrPreps.map(h => ({ wch: Math.max(16, h.length + 4) }));
+  XLSX.utils.book_append_sheet(wb, wsPreps, 'Preparaciones');
+
+  // Hoja Titulos
+  const hdrTit = ['codigo','fecha_titulo','valor','vencimiento_titulo','analista','observaciones'];
+  const ejTit = [
+    ['SVH-C01','2024-03-16','0.1023','2024-04-15','jperez','Patron biftalato'],
+    ['SVH-C01','2024-06-10','0.1019','2024-07-10','jperez','Re-titulacion trimestral'],
+    ['SVH-C02','2024-09-11','0.1025','2024-10-11','mlopez','Patron primario']
+  ];
+  const wsTit = XLSX.utils.aoa_to_sheet([hdrTit, ...ejTit]);
+  wsTit['!cols'] = hdrTit.map(h => ({ wch: Math.max(16, h.length + 4) }));
+  XLSX.utils.book_append_sheet(wb, wsTit, 'Titulos');
+
+  // Hoja Instrucciones
+  const instr = [
+    ['INSTRUCCIONES — Plantilla Historico Sol. Volumetricas'],
+    [''],
+    ['Use esta plantilla para cargar preparaciones y titulaciones previas a la implementacion del sistema.'],
+    ['Las preparaciones se asocian al Maestro automaticamente segun el prefijo del codigo (ej. SVH-C01 -> articulo con Codigo Base "SVH").'],
+    [''],
+    ['HOJA "Preparaciones": una fila por preparacion historica.'],
+    ['  codigo            [OBLIGATORIO] Codigo completo (ej. SVH-C01). Prefijo debe coincidir con un Codigo Base del Maestro.'],
+    ['  fecha_prep        [OBLIGATORIO] Fecha de preparacion (YYYY-MM-DD).'],
+    ['  vencimiento       [opcional]    Si no se indica, se calcula con la validez del Maestro.'],
+    ['  estado            [opcional]    en_uso | agotada | dado_de_baja. Por defecto: agotada.'],
+    ['  ingresado_por     [opcional]    Usuario que dio el ingreso original. Por defecto: usuario actual.'],
+    ['  fecha_ingreso     [opcional]    Fecha del registro. Por defecto: fecha_prep.'],
+    ['  observaciones     [opcional]    Texto libre (queda como comentario inicial).'],
+    [''],
+    ['HOJA "Titulos": una fila por titulo. Cada titulo se asocia a la preparacion con el mismo codigo.'],
+    ['  codigo               [OBLIGATORIO] Codigo de la preparacion (debe estar en la hoja Preparaciones).'],
+    ['  fecha_titulo         [OBLIGATORIO] Fecha de la titulacion (YYYY-MM-DD).'],
+    ['  valor                [OBLIGATORIO] Valor obtenido (numero o texto).'],
+    ['  vencimiento_titulo   [opcional]    Si falta, se calcula con la validez de titulo del Maestro.'],
+    ['  analista             [opcional]    Usuario que titulo. Por defecto: ingresado_por de la preparacion.'],
+    ['  observaciones        [opcional]    Texto libre.'],
+    [''],
+    ['Notas:'],
+    ['  - Si el codigo de preparacion ya existe en el sistema, esa fila se omite con aviso en el preview.'],
+    ['  - Los registros importados se marcan como "historico" en el Audit Trail.'],
+    ['  - Solo el Gestor puede ejecutar la importacion.'],
+    ['  - Se admite que la hoja "Titulos" este vacia (solo se importan preparaciones).']
+  ];
+  const wsInst = XLSX.utils.aoa_to_sheet(instr);
+  wsInst['!cols'] = [{ wch: 110 }];
+  XLSX.utils.book_append_sheet(wb, wsInst, 'Instrucciones');
+
+  XLSX.writeFile(wb, `Plantilla_Historico_SolVolumetricas_${today()}.xlsx`);
+}
+
+function openImportHistoricoSolVolModal() {
+  if (!isGestor()) { toast('Solo el Gestor puede importar historicos', 'error'); return; }
+
+  openModal('Importar Histórico — Sol. Volumétricas', `
+    <div class="tabs" style="margin-bottom:12px">
+      <button class="tab active" onclick="switchTab(event,'hist-tab-guia')">📋 Guía de formato</button>
+      <button class="tab" onclick="switchTab(event,'hist-tab-cargar')">⬆ Cargar archivo</button>
+    </div>
+
+    <div id="hist-tab-guia">
+      <p style="font-size:11px;color:var(--text2);margin-bottom:10px">
+        Use esta carga para volcar preparaciones y títulos previos a la implementación del sistema.
+        El archivo Excel debe tener dos hojas: <strong>Preparaciones</strong> y <strong>Titulos</strong>.
+      </p>
+
+      <p style="font-size:11px;font-weight:600;margin-bottom:4px">Hoja "Preparaciones" — una fila por preparación:</p>
+      <div class="table-wrap" style="margin-bottom:12px">
+        <table>
+          <thead><tr><th>Columna</th><th>Tipo</th><th>Como completar</th></tr></thead>
+          <tbody>
+            <tr><td class="col-mono" style="font-size:11px">codigo</td><td><span class="badge badge-vto-vencido">Obligatorio</span></td><td style="font-size:11px;color:var(--text2)">Codigo completo (ej. SVH-C01). El prefijo debe coincidir con un Codigo Base del Maestro.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">fecha_prep</td><td><span class="badge badge-vto-vencido">Obligatorio</span></td><td style="font-size:11px;color:var(--text2)">YYYY-MM-DD</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">vencimiento</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Si falta, se calcula con la validez del Maestro.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">estado</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">en_uso | agotada | dado_de_baja. Por defecto: agotada.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">ingresado_por</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Usuario original. Por defecto: usuario actual.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">fecha_ingreso</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Por defecto: fecha_prep.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">observaciones</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Queda como comentario inicial.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="font-size:11px;font-weight:600;margin-bottom:4px">Hoja "Titulos" — una fila por titulación histórica:</p>
+      <div class="table-wrap" style="margin-bottom:10px">
+        <table>
+          <thead><tr><th>Columna</th><th>Tipo</th><th>Como completar</th></tr></thead>
+          <tbody>
+            <tr><td class="col-mono" style="font-size:11px">codigo</td><td><span class="badge badge-vto-vencido">Obligatorio</span></td><td style="font-size:11px;color:var(--text2)">Codigo de la preparacion (debe estar en la hoja Preparaciones).</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">fecha_titulo</td><td><span class="badge badge-vto-vencido">Obligatorio</span></td><td style="font-size:11px;color:var(--text2)">YYYY-MM-DD</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">valor</td><td><span class="badge badge-vto-vencido">Obligatorio</span></td><td style="font-size:11px;color:var(--text2)">Valor del titulo (numero o texto).</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">vencimiento_titulo</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Si falta, se calcula con la validez de titulo del Maestro.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">analista</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Por defecto: ingresado_por de la preparacion.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">observaciones</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Texto libre.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px;font-size:11px;color:var(--text2);margin-bottom:12px">
+        <strong>Notas:</strong>
+        <ul style="margin:6px 0 0 18px;line-height:1.6">
+          <li>Si un codigo ya existe en el sistema, esa fila se omite y se reporta en el preview.</li>
+          <li>Los registros importados se marcan como "historico" en el Audit Trail.</li>
+          <li>La hoja "Titulos" puede estar vacia (solo se importan preparaciones).</li>
+        </ul>
+      </div>
+
+      <button class="btn btn-secondary btn-sm" onclick="descargarPlantillaHistoricoSolVol()">
+        ⬇ Descargar plantilla Excel
+      </button>
+    </div>
+
+    <div id="hist-tab-cargar" style="display:none">
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Archivo Excel (.xlsx)</label>
+        <input type="file" id="hist-svol-file" accept=".xlsx,.xls" style="padding:6px">
+      </div>
+      <p style="font-size:10px;color:var(--text3)">
+        Al presionar <strong>Analizar</strong> se mostrara un preview con la cantidad de filas validas y errores antes de confirmar.
+      </p>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="analizarHistoricoSolVol()">Analizar archivo</button>`);
+}
+
+async function analizarHistoricoSolVol() {
+  if (!isGestor()) return;
+  const file = document.getElementById('hist-svol-file')?.files?.[0];
+  if (!file) { toast('Seleccione un archivo Excel', 'error'); return; }
+  if (!window.XLSX) { toast('Libreria XLSX no disponible', 'error'); return; }
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+
+      // Buscar hojas con tolerancia a may/min y acentos
+      const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+      const findSheet = (cands) => {
+        for (const c of cands) {
+          const m = wb.SheetNames.find(s => norm(s) === norm(c));
+          if (m) return wb.Sheets[m];
+        }
+        return null;
+      };
+      const wsPreps = findSheet(['Preparaciones','Preparacion','Prep','Preps']);
+      const wsTit   = findSheet(['Titulos','Títulos','Titulaciones','Tit']);
+
+      if (!wsPreps) { toast('No se encontro la hoja "Preparaciones"', 'error'); return; }
+
+      const rowsPreps = XLSX.utils.sheet_to_json(wsPreps, { defval: '', raw: false });
+      const rowsTit   = wsTit ? XLSX.utils.sheet_to_json(wsTit, { defval: '', raw: false }) : [];
+
+      // Indice de Maestros por codigo_base
+      const maestros = (STATE.data.maestro?.articulos || []).filter(a => a.tipo === 'sol_volumetrica');
+      const maestrosByBase = {};
+      for (const m of maestros) if (m.codigo_base) maestrosByBase[m.codigo_base.toUpperCase()] = m;
+
+      // Indice de preparaciones existentes por codigo
+      const existentes = new Set((STATE.data.sol_volumetricas?.registros || [])
+        .filter(r => r.estado !== 'dado_de_baja')
+        .map(r => r.codigo));
+
+      const normDate = (v) => {
+        if (!v) return '';
+        const s = String(v).trim();
+        // Acepta YYYY-MM-DD y DD/MM/YYYY
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+        const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+        if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+        return s.slice(0,10);
+      };
+
+      // Parsear preparaciones
+      const preps = [];
+      const erroresPreps = [];
+      for (let i = 0; i < rowsPreps.length; i++) {
+        const row = rowsPreps[i];
+        const fila = i + 2;
+        const codigo = String(row.codigo || '').trim();
+        if (!codigo) { erroresPreps.push({ fila, error: 'codigo vacio' }); continue; }
+        if (existentes.has(codigo)) { erroresPreps.push({ fila, error: `codigo "${codigo}" ya existe en el sistema` }); continue; }
+
+        const lastDash = codigo.lastIndexOf('-');
+        if (lastDash < 1) { erroresPreps.push({ fila, error: `codigo "${codigo}" sin formato prefijo-sufijo (ej. SVH-C01)` }); continue; }
+        const prefix = codigo.slice(0, lastDash).toUpperCase();
+        const art = maestrosByBase[prefix];
+        if (!art) { erroresPreps.push({ fila, error: `prefijo "${prefix}" no coincide con ningun Codigo Base del Maestro` }); continue; }
+
+        const fechaPrep = normDate(row.fecha_prep);
+        if (!fechaPrep) { erroresPreps.push({ fila, error: 'fecha_prep vacia o invalida' }); continue; }
+
+        const estadoRaw = String(row.estado || '').toLowerCase().trim();
+        const estado = ['en_uso','agotada','dado_de_baja'].includes(estadoRaw) ? estadoRaw : 'agotada';
+
+        let vencimiento = normDate(row.vencimiento) || null;
+        if (!vencimiento && art.validez_prep_dias) vencimiento = addDays(fechaPrep, art.validez_prep_dias);
+
+        const reg = {
+          id: uuid(),
+          maestro_id: art.id,
+          codigo,
+          fecha_prep: fechaPrep,
+          vencimiento,
+          estado,
+          titulos: [],
+          fecha_ingreso: normDate(row.fecha_ingreso) || fechaPrep,
+          ingresado_por: String(row.ingresado_por || '').trim() || STATE.session?.username || 'historico',
+          ts_mod: new Date().toISOString(),
+          comentarios: [],
+          origen: 'historico'
+        };
+        const obs = String(row.observaciones || '').trim();
+        if (obs) reg.comentarios.push({
+          id: uuid(),
+          fecha: new Date().toISOString(),
+          usuario: STATE.session?.username || 'historico',
+          texto: 'Importacion historica: ' + obs
+        });
+        preps.push({ codigo, reg });
+      }
+
+      // Indexar prep por codigo para asociar titulos
+      const prepsByCodigo = {};
+      for (const p of preps) prepsByCodigo[p.codigo] = p.reg;
+
+      // Tambien aceptar titulos para preparaciones YA existentes (anexar)
+      const existentesByCodigo = {};
+      for (const r of (STATE.data.sol_volumetricas?.registros || [])) {
+        if (r.estado !== 'dado_de_baja') existentesByCodigo[r.codigo] = r;
+      }
+
+      const titulosNuevos = [];
+      const titulosExistentes = [];
+      const erroresTit = [];
+      for (let i = 0; i < rowsTit.length; i++) {
+        const row = rowsTit[i];
+        const fila = i + 2;
+        const codigo = String(row.codigo || '').trim();
+        if (!codigo) { erroresTit.push({ fila, error: 'codigo vacio' }); continue; }
+
+        const prep = prepsByCodigo[codigo] || existentesByCodigo[codigo];
+        if (!prep) { erroresTit.push({ fila, error: `codigo "${codigo}" no esta en la hoja Preparaciones ni en el sistema` }); continue; }
+
+        const fechaTit = normDate(row.fecha_titulo);
+        if (!fechaTit) { erroresTit.push({ fila, error: 'fecha_titulo vacia o invalida' }); continue; }
+        const valor = row.valor;
+        if (valor === '' || valor == null) { erroresTit.push({ fila, error: 'valor vacio' }); continue; }
+
+        const art = (STATE.data.maestro?.articulos||[]).find(a => a.id === prep.maestro_id);
+        let vencTit = normDate(row.vencimiento_titulo) || null;
+        if (!vencTit && art?.validez_tit_dias) vencTit = addDays(fechaTit, art.validez_tit_dias);
+
+        const t = {
+          id: uuid(),
+          fecha_titulo: fechaTit,
+          valor,
+          vencimiento_titulo: vencTit,
+          analista: String(row.analista || '').trim() || prep.ingresado_por || 'historico',
+          observaciones: String(row.observaciones || '').trim() || null,
+          origen: 'historico'
+        };
+        if (!prep.titulos) prep.titulos = [];
+        prep.titulos.push(t);
+        if (prepsByCodigo[codigo]) titulosNuevos.push(t);
+        else titulosExistentes.push({ t, codigo });
+      }
+
+      // Ordenar titulos por fecha (cronologico)
+      for (const p of preps) {
+        p.reg.titulos.sort((a,b) => (a.fecha_titulo||'').localeCompare(b.fecha_titulo||''));
+      }
+
+      const totalErrores = erroresPreps.length + erroresTit.length;
+      const tablaErr = (lista) => `<div class="table-wrap" style="max-height:140px;overflow:auto;margin-bottom:10px">
+        <table style="font-size:10px"><thead><tr><th>Fila</th><th>Error</th></tr></thead>
+          <tbody>${lista.map(e=>`<tr><td class="col-mono">${e.fila}</td><td style="color:var(--red)">${esc(e.error)}</td></tr>`).join('')}</tbody>
+        </table></div>`;
+
+      const preview = `
+        <div class="info-box" style="margin-bottom:12px">
+          <strong>Resumen de la importacion</strong><br>
+          Preparaciones nuevas: <strong>${preps.length}</strong><br>
+          Titulos asociados a nuevas preparaciones: <strong>${titulosNuevos.length}</strong><br>
+          Titulos agregados a preparaciones existentes: <strong>${titulosExistentes.length}</strong>
+          ${totalErrores ? `<br><span style="color:var(--red)">Errores (filas ignoradas): ${totalErrores}</span>` : ''}
+        </div>
+        ${erroresPreps.length ? `<p style="font-size:11px;font-weight:600;margin-bottom:4px">Errores en hoja Preparaciones:</p>${tablaErr(erroresPreps)}` : ''}
+        ${erroresTit.length ? `<p style="font-size:11px;font-weight:600;margin-bottom:4px">Errores en hoja Titulos:</p>${tablaErr(erroresTit)}` : ''}
+      `;
+
+      if (!preps.length && !titulosExistentes.length) {
+        openModal('Importacion Historica — Sin datos validos', preview,
+          `<button class="btn btn-secondary" onclick="closeModal()">Cerrar</button>`);
+        return;
+      }
+
+      // Guardar estado para confirmar
+      STATE._histSvol = {
+        preps,
+        titulosNuevos: titulosNuevos.length,
+        titulosExistentes
+      };
+
+      const totalTit = titulosNuevos.length + titulosExistentes.length;
+      openModal('Importacion Historica — Confirmar', preview,
+        `<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+         <button class="btn btn-primary" onclick="confirmarImportHistoricoSolVol()">✓ Importar ${preps.length} prep. + ${totalTit} titulo${totalTit!==1?'s':''}</button>`);
+
+    } catch (err) {
+      console.error(err);
+      toast('Error al leer el archivo: ' + err.message, 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function confirmarImportHistoricoSolVol() {
+  if (!isGestor()) return;
+  const data = STATE._histSvol;
+  if (!data) return;
+
+  if (!STATE.data.sol_volumetricas) STATE.data.sol_volumetricas = { registros: [] };
+
+  // Insertar preparaciones nuevas (sus titulos ya estan en reg.titulos)
+  for (const p of data.preps) {
+    STATE.data.sol_volumetricas.registros.push(p.reg);
+  }
+
+  // Los titulos para preparaciones existentes ya fueron empujados a prep.titulos
+  // durante el analisis (referencia compartida), pero necesitan ordenarse
+  for (const x of data.titulosExistentes) {
+    const reg = (STATE.data.sol_volumetricas.registros).find(r => r.codigo === x.codigo);
+    if (reg) {
+      reg.titulos = reg.titulos || [];
+      reg.titulos.sort((a,b) => (a.fecha_titulo||'').localeCompare(b.fecha_titulo||''));
+      reg.ts_mod = new Date().toISOString();
+    }
+  }
+
+  const totalTit = data.titulosNuevos + data.titulosExistentes.length;
+  registrarMovimiento('ingreso', 'sol_volumetricas', 'import_historico',
+    `Importacion historica: ${data.preps.length} preparaciones, ${totalTit} titulos.`);
+
+  await pushToGitHub('sol_volumetricas');
+  await pushToGitHub('movimientos');
+
+  delete STATE._histSvol;
+  closeModal();
+  renderPage(STATE.page);
+  toast(`Historico importado: ${data.preps.length} prep. + ${totalTit} titulo${totalTit!==1?'s':''}`, 'success');
+}
+
+/* ════════════════════════════════════════════════════════════
+   IMPORTACION HISTORICA — SOL. REACTIVO/ADEC. (sol_otras)
+   ── Misma logica que sol_volumetricas pero sin titulos.
+   El campo uso_adec solo aplica si el articulo del Maestro es tipo_solucion='adecuabilidad'.
+════════════════════════════════════════════════════════════ */
+
+function descargarPlantillaHistoricoSolOtras() {
+  if (!window.XLSX) { toast('Libreria XLSX no disponible', 'error'); return; }
+  const wb = XLSX.utils.book_new();
+
+  // Hoja Preparaciones
+  const hdrPreps = ['codigo','fecha_prep','vencimiento','estado','uso_adec','ingresado_por','fecha_ingreso','observaciones'];
+  const ejPreps = [
+    ['SRH-C01','2024-02-10','2024-05-10','agotada','','jperez','2024-02-10','Fase movil HPLC HCl'],
+    ['SAP-C03','2024-08-22','2024-11-22','en_uso','Producto','mlopez','2024-08-22','Sol. adecuabilidad metformina']
+  ];
+  const wsPreps = XLSX.utils.aoa_to_sheet([hdrPreps, ...ejPreps]);
+  wsPreps['!cols'] = hdrPreps.map(h => ({ wch: Math.max(16, h.length + 4) }));
+  XLSX.utils.book_append_sheet(wb, wsPreps, 'Preparaciones');
+
+  // Hoja Instrucciones
+  const instr = [
+    ['INSTRUCCIONES — Plantilla Historico Sol. Reactivo/Adecuabilidad'],
+    [''],
+    ['Use esta plantilla para cargar preparaciones previas a la implementacion del sistema.'],
+    ['Las preparaciones se asocian al Maestro segun el prefijo del codigo (ej. SRH-C01 -> articulo con Codigo Base "SRH").'],
+    [''],
+    ['HOJA "Preparaciones": una fila por preparacion historica.'],
+    ['  codigo            [OBLIGATORIO] Codigo completo (ej. SRH-C01). Prefijo debe coincidir con un Codigo Base del Maestro.'],
+    ['  fecha_prep        [OBLIGATORIO] Fecha de preparacion (YYYY-MM-DD).'],
+    ['  vencimiento       [opcional]    Si falta, se calcula con la validez del Maestro.'],
+    ['  estado            [opcional]    en_uso | agotada | dado_de_baja. Por defecto: agotada.'],
+    ['  uso_adec          [opcional]    Solo si el articulo del Maestro es tipo "Adecuabilidad". Valores: Producto | Materia Prima.'],
+    ['  ingresado_por     [opcional]    Usuario que dio el ingreso original. Por defecto: usuario actual.'],
+    ['  fecha_ingreso     [opcional]    Fecha del registro. Por defecto: fecha_prep.'],
+    ['  observaciones     [opcional]    Texto libre (queda como comentario inicial).'],
+    [''],
+    ['Notas:'],
+    ['  - Si el codigo ya existe en el sistema, esa fila se omite con aviso.'],
+    ['  - Los registros importados se marcan como "historico" en el Audit Trail.'],
+    ['  - Solo el Gestor puede ejecutar la importacion.'],
+    ['  - Las soluciones reactivo/adecuabilidad no llevan historial de titulos (solo las volumetricas).']
+  ];
+  const wsInst = XLSX.utils.aoa_to_sheet(instr);
+  wsInst['!cols'] = [{ wch: 110 }];
+  XLSX.utils.book_append_sheet(wb, wsInst, 'Instrucciones');
+
+  XLSX.writeFile(wb, `Plantilla_Historico_SolReactivoAdec_${today()}.xlsx`);
+}
+
+function openImportHistoricoSolOtrasModal() {
+  if (!isGestor()) { toast('Solo el Gestor puede importar historicos', 'error'); return; }
+
+  openModal('Importar Histórico — Sol. Reactivo/Adec.', `
+    <div class="tabs" style="margin-bottom:12px">
+      <button class="tab active" onclick="switchTab(event,'histo-tab-guia')">📋 Guía de formato</button>
+      <button class="tab" onclick="switchTab(event,'histo-tab-cargar')">⬆ Cargar archivo</button>
+    </div>
+
+    <div id="histo-tab-guia">
+      <p style="font-size:11px;color:var(--text2);margin-bottom:10px">
+        Use esta carga para volcar preparaciones previas a la implementación del sistema.
+        El archivo Excel debe tener una hoja <strong>Preparaciones</strong>.
+        Las soluciones reactivo/adec. no llevan historial de títulos (eso es exclusivo de las volumétricas).
+      </p>
+
+      <p style="font-size:11px;font-weight:600;margin-bottom:4px">Hoja "Preparaciones" — una fila por preparación:</p>
+      <div class="table-wrap" style="margin-bottom:12px">
+        <table>
+          <thead><tr><th>Columna</th><th>Tipo</th><th>Como completar</th></tr></thead>
+          <tbody>
+            <tr><td class="col-mono" style="font-size:11px">codigo</td><td><span class="badge badge-vto-vencido">Obligatorio</span></td><td style="font-size:11px;color:var(--text2)">Codigo completo (ej. SRH-C01). El prefijo debe coincidir con un Codigo Base del Maestro.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">fecha_prep</td><td><span class="badge badge-vto-vencido">Obligatorio</span></td><td style="font-size:11px;color:var(--text2)">YYYY-MM-DD</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">vencimiento</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Si falta, se calcula con la validez del Maestro.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">estado</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">en_uso | agotada | dado_de_baja. Por defecto: agotada.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">uso_adec</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Solo si el articulo es tipo "Adecuabilidad". Valores: Producto | Materia Prima.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">ingresado_por</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Usuario original. Por defecto: usuario actual.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">fecha_ingreso</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Por defecto: fecha_prep.</td></tr>
+            <tr><td class="col-mono" style="font-size:11px">observaciones</td><td><span class="badge badge-gray">Opcional</span></td><td style="font-size:11px;color:var(--text2)">Queda como comentario inicial.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px;font-size:11px;color:var(--text2);margin-bottom:12px">
+        <strong>Notas:</strong>
+        <ul style="margin:6px 0 0 18px;line-height:1.6">
+          <li>Si un codigo ya existe en el sistema, esa fila se omite y se reporta en el preview.</li>
+          <li>Los registros importados se marcan como "historico" en el Audit Trail.</li>
+          <li>El campo <span class="col-mono">uso_adec</span> se ignora si el articulo del Maestro es tipo "Reactivo".</li>
+        </ul>
+      </div>
+
+      <button class="btn btn-secondary btn-sm" onclick="descargarPlantillaHistoricoSolOtras()">
+        ⬇ Descargar plantilla Excel
+      </button>
+    </div>
+
+    <div id="histo-tab-cargar" style="display:none">
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Archivo Excel (.xlsx)</label>
+        <input type="file" id="hist-sotras-file" accept=".xlsx,.xls" style="padding:6px">
+      </div>
+      <p style="font-size:10px;color:var(--text3)">
+        Al presionar <strong>Analizar</strong> se mostrara un preview con la cantidad de filas validas y errores antes de confirmar.
+      </p>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="analizarHistoricoSolOtras()">Analizar archivo</button>`);
+}
+
+async function analizarHistoricoSolOtras() {
+  if (!isGestor()) return;
+  const file = document.getElementById('hist-sotras-file')?.files?.[0];
+  if (!file) { toast('Seleccione un archivo Excel', 'error'); return; }
+  if (!window.XLSX) { toast('Libreria XLSX no disponible', 'error'); return; }
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+      const findSheet = (cands) => {
+        for (const c of cands) {
+          const m = wb.SheetNames.find(s => norm(s) === norm(c));
+          if (m) return wb.Sheets[m];
+        }
+        return null;
+      };
+      const wsPreps = findSheet(['Preparaciones','Preparacion','Prep','Preps']);
+      if (!wsPreps) { toast('No se encontro la hoja "Preparaciones"', 'error'); return; }
+
+      const rowsPreps = XLSX.utils.sheet_to_json(wsPreps, { defval: '', raw: false });
+
+      const maestros = (STATE.data.maestro?.articulos || []).filter(a => a.tipo === 'sol_otra');
+      const maestrosByBase = {};
+      for (const m of maestros) if (m.codigo_base) maestrosByBase[m.codigo_base.toUpperCase()] = m;
+
+      const existentes = new Set((STATE.data.sol_otras?.registros || [])
+        .filter(r => r.estado !== 'dado_de_baja')
+        .map(r => r.codigo));
+
+      const normDate = (v) => {
+        if (!v) return '';
+        const s = String(v).trim();
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+        const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+        if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+        return s.slice(0,10);
+      };
+
+      const preps = [];
+      const erroresPreps = [];
+      for (let i = 0; i < rowsPreps.length; i++) {
+        const row = rowsPreps[i];
+        const fila = i + 2;
+        const codigo = String(row.codigo || '').trim();
+        if (!codigo) { erroresPreps.push({ fila, error: 'codigo vacio' }); continue; }
+        if (existentes.has(codigo)) { erroresPreps.push({ fila, error: `codigo "${codigo}" ya existe en el sistema` }); continue; }
+
+        const lastDash = codigo.lastIndexOf('-');
+        if (lastDash < 1) { erroresPreps.push({ fila, error: `codigo "${codigo}" sin formato prefijo-sufijo (ej. SRH-C01)` }); continue; }
+        const prefix = codigo.slice(0, lastDash).toUpperCase();
+        const art = maestrosByBase[prefix];
+        if (!art) { erroresPreps.push({ fila, error: `prefijo "${prefix}" no coincide con ningun Codigo Base del Maestro (Sol. Reactivo/Adec.)` }); continue; }
+
+        const fechaPrep = normDate(row.fecha_prep);
+        if (!fechaPrep) { erroresPreps.push({ fila, error: 'fecha_prep vacia o invalida' }); continue; }
+
+        const estadoRaw = String(row.estado || '').toLowerCase().trim();
+        const estado = ['en_uso','agotada','dado_de_baja'].includes(estadoRaw) ? estadoRaw : 'agotada';
+
+        let vencimiento = normDate(row.vencimiento) || null;
+        if (!vencimiento && art.validez_prep_dias) vencimiento = addDays(fechaPrep, art.validez_prep_dias);
+
+        // uso_adec: solo si el articulo es de tipo adecuabilidad
+        let usoAdec = null;
+        if (art.tipo_solucion === 'adecuabilidad') {
+          const raw = String(row.uso_adec || '').trim().toLowerCase();
+          if (raw.startsWith('mat')) usoAdec = 'Materia Prima';
+          else if (raw.startsWith('prod')) usoAdec = 'Producto';
+          else usoAdec = null;
+        }
+
+        const reg = {
+          id: uuid(),
+          maestro_id: art.id,
+          codigo,
+          fecha_prep: fechaPrep,
+          vencimiento,
+          estado,
+          uso_adec: usoAdec,
+          fecha_ingreso: normDate(row.fecha_ingreso) || fechaPrep,
+          ingresado_por: String(row.ingresado_por || '').trim() || STATE.session?.username || 'historico',
+          ts_mod: new Date().toISOString(),
+          comentarios: [],
+          origen: 'historico'
+        };
+        const obs = String(row.observaciones || '').trim();
+        if (obs) reg.comentarios.push({
+          id: uuid(),
+          fecha: new Date().toISOString(),
+          usuario: STATE.session?.username || 'historico',
+          texto: 'Importacion historica: ' + obs
+        });
+        preps.push({ codigo, reg });
+      }
+
+      const totalErrores = erroresPreps.length;
+      const tablaErr = (lista) => `<div class="table-wrap" style="max-height:140px;overflow:auto;margin-bottom:10px">
+        <table style="font-size:10px"><thead><tr><th>Fila</th><th>Error</th></tr></thead>
+          <tbody>${lista.map(e=>`<tr><td class="col-mono">${e.fila}</td><td style="color:var(--red)">${esc(e.error)}</td></tr>`).join('')}</tbody>
+        </table></div>`;
+
+      const preview = `
+        <div class="info-box" style="margin-bottom:12px">
+          <strong>Resumen de la importacion</strong><br>
+          Preparaciones a insertar: <strong>${preps.length}</strong>
+          ${totalErrores ? `<br><span style="color:var(--red)">Errores (filas ignoradas): ${totalErrores}</span>` : ''}
+        </div>
+        ${erroresPreps.length ? `<p style="font-size:11px;font-weight:600;margin-bottom:4px">Errores en hoja Preparaciones:</p>${tablaErr(erroresPreps)}` : ''}
+      `;
+
+      if (!preps.length) {
+        openModal('Importacion Historica — Sin datos validos', preview,
+          `<button class="btn btn-secondary" onclick="closeModal()">Cerrar</button>`);
+        return;
+      }
+
+      STATE._histSotras = { preps };
+
+      openModal('Importacion Historica — Confirmar', preview,
+        `<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+         <button class="btn btn-primary" onclick="confirmarImportHistoricoSolOtras()">✓ Importar ${preps.length} preparacion${preps.length!==1?'es':''}</button>`);
+
+    } catch (err) {
+      console.error(err);
+      toast('Error al leer el archivo: ' + err.message, 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function confirmarImportHistoricoSolOtras() {
+  if (!isGestor()) return;
+  const data = STATE._histSotras;
+  if (!data) return;
+
+  if (!STATE.data.sol_otras) STATE.data.sol_otras = { registros: [] };
+
+  for (const p of data.preps) {
+    STATE.data.sol_otras.registros.push(p.reg);
+  }
+
+  registrarMovimiento('ingreso', 'sol_otras', 'import_historico',
+    `Importacion historica: ${data.preps.length} preparaciones.`);
+
+  await pushToGitHub('sol_otras');
+  await pushToGitHub('movimientos');
+
+  delete STATE._histSotras;
+  closeModal();
+  renderPage(STATE.page);
+  toast(`Historico importado: ${data.preps.length} preparacion${data.preps.length!==1?'es':''}`, 'success');
+}
+
+/* ════════════════════════════════════════════════════════════
    AUDIT TRAIL
 ════════════════════════════════════════════════════════════ */
 function renderAudit() {
@@ -4618,20 +5264,27 @@ async function _doForceSyncFromRemote() {
 function renderUsuariosConfig() {
   const users = [...(STATE.data.usuarios?.lista || [])]
     .sort((a,b) => (a.display||a.username).localeCompare(b.display||b.username,'es'));
+  const gestores = users.filter(u => u.role === 'gestor').length;
   return `
     <div class="table-wrap" style="margin-bottom:10px">
       <table><thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Acciones</th></tr></thead>
-        <tbody>${users.map(u=>`
+        <tbody>${users.map(u=>{
+          // Es el ultimo gestor: no puede degradarse ni eliminarse
+          const esUltimoGestor = u.role === 'gestor' && gestores === 1;
+          return `
           <tr>
             <td class="col-mono">${esc(u.username)}</td>
             <td>${esc(u.display)}</td>
-            <td><span class="badge ${u.role==='gestor'?'badge-purple':'badge-blue'}">${u.role}</span></td>
-            <td style="display:flex;gap:6px">
+            <td><span class="badge ${u.role==='gestor'?'badge-purple':'badge-blue'}">${u.role}</span>${esUltimoGestor?' <span class="badge badge-gray" title="Es el unico Gestor del sistema" style="font-size:9px;margin-left:4px">único</span>':''}</td>
+            <td style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" onclick="cambiarRolUsuario('${u.id}')"
+                ${esUltimoGestor?' disabled title="No se puede degradar al unico Gestor"':' title="Cambiar rol"'}>🔄 Rol</button>
               <button class="btn btn-secondary btn-sm" onclick="resetPassword('${u.id}')">🔑 Reset Pass</button>
               <button class="btn btn-danger btn-sm" onclick="eliminarUsuario('${u.id}','${esc(u.username)}')"
-                ${u.id===STATE.session?.id?' disabled title="No puede eliminarse a si mismo"':''}>🗑</button>
+                ${u.id===STATE.session?.id?' disabled title="No puede eliminarse a si mismo"':esUltimoGestor?' disabled title="No se puede eliminar al unico Gestor"':''}>🗑</button>
             </td>
-          </tr>`).join('')}
+          </tr>`;
+        }).join('')}
         </tbody>
       </table>
     </div>
@@ -4665,6 +5318,88 @@ async function _doEliminarUsuario(id, username) {
   await pushToGitHub('movimientos');
   renderPage(STATE.page);
   toast(`Usuario "${username}" eliminado`, 'success');
+}
+
+function cambiarRolUsuario(id) {
+  if (!isGestor()) { toast('Solo el Gestor puede cambiar roles', 'error'); return; }
+  const users = STATE.data.usuarios?.lista || [];
+  const u = users.find(x => x.id === id);
+  if (!u) { toast('Usuario no encontrado', 'error'); return; }
+
+  const gestores = users.filter(x => x.role === 'gestor').length;
+  const esUltimoGestor = u.role === 'gestor' && gestores === 1;
+  if (esUltimoGestor) {
+    toast('No se puede degradar al unico Gestor del sistema', 'error');
+    return;
+  }
+  const esSelf = u.id === STATE.session?.id;
+
+  openModal(`Cambiar rol — ${esc(u.display||u.username)}`, `
+    <div class="info-box" style="margin-bottom:12px;font-size:12px">
+      <div><strong>${esc(u.display||'')}</strong> <span style="color:var(--text2)">(${esc(u.username)})</span></div>
+      <div style="margin-top:4px">Rol actual: <span class="badge ${u.role==='gestor'?'badge-purple':'badge-blue'}">${u.role}</span></div>
+    </div>
+    <div class="form-group">
+      <label>Nuevo rol<span class="req">*</span></label>
+      <select id="cr-role">
+        <option value="usuario"${u.role==='usuario'?' selected':''}>Usuario (Analista)</option>
+        <option value="gestor"${u.role==='gestor'?' selected':''}>Gestor</option>
+      </select>
+      <span class="form-hint">Gestor: acceso total (config, maestros, bajas, importaciones). Usuario: alta de stock y consumos.</span>
+    </div>
+    ${esSelf ? `
+    <div style="background:rgba(210,153,34,.12);border:1px solid rgba(210,153,34,.3);border-radius:var(--r);padding:10px;margin-top:10px;font-size:11px">
+      ⚠️ Está cambiando su <strong>propio rol</strong>. Si elige "Usuario" perdera el acceso a la pantalla de Configuracion en esta sesion.
+    </div>` : ''}
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="_doCambiarRolUsuario('${id}')">Guardar</button>`);
+}
+
+async function _doCambiarRolUsuario(id) {
+  if (!isGestor()) return;
+  const users = STATE.data.usuarios?.lista || [];
+  const u = users.find(x => x.id === id);
+  if (!u) return;
+
+  const nuevoRol = gv('cr-role');
+  if (!['gestor','usuario'].includes(nuevoRol)) { toast('Rol invalido', 'error'); return; }
+  if (nuevoRol === u.role) { closeModal(); return; }
+
+  // Si esta degradando un gestor, verificar que quede al menos uno
+  if (u.role === 'gestor' && nuevoRol !== 'gestor') {
+    const otrosGestores = users.filter(x => x.role === 'gestor' && x.id !== id).length;
+    if (otrosGestores === 0) {
+      toast('No se puede degradar: debe quedar al menos un Gestor', 'error');
+      return;
+    }
+  }
+
+  const rolAnterior = u.role;
+  u.role = nuevoRol;
+  u.ts_mod = new Date().toISOString();
+
+  const esSelf = id === STATE.session?.id;
+  let redirigir = false;
+  if (esSelf) {
+    STATE.session.role = nuevoRol;
+    try { localStorage.setItem('humanovastock_session', JSON.stringify(STATE.session)); } catch {}
+    // Actualizar UI dependiente del rol sin re-navegar a dashboard innecesariamente
+    const adminSection = document.getElementById('nav-admin-section');
+    if (adminSection) adminSection.style.display = isGestor() ? '' : 'none';
+    const roleDisplay = document.getElementById('user-role-display');
+    if (roleDisplay) roleDisplay.textContent = nuevoRol === 'gestor' ? 'Gestor' : 'Usuario';
+    // Si la vista actual requiere Gestor y ya no lo es, rebotar a dashboard
+    if (!isGestor() && ['config','avisos','audit'].includes(STATE.page)) redirigir = true;
+  }
+
+  registrarMovimiento('edicion', 'usuarios', id,
+    `Cambio de rol: ${u.username} (${rolAnterior} -> ${nuevoRol})`);
+  await pushToGitHub('usuarios');
+  await pushToGitHub('movimientos');
+  closeModal();
+  if (redirigir) navigate('dashboard');
+  else renderPage(STATE.page);
+  toast(`Rol actualizado: ${u.display||u.username} es ahora ${nuevoRol}`, 'success');
 }
 
 function openAddUsuario() {
