@@ -1,15 +1,6 @@
 {
   "log": [
     {
-      "id": "857a5726-ad9d-4e06-8b9f-9375456e05a0",
-      "fecha": "2026-05-25T01:28:23.128Z",
-      "usuario": "FM",
-      "tipo": "edicion",
-      "modulo": "usuarios",
-      "ref_id": "dc78d23b-7c4e-48cc-98e8-e70948f533b3",
-      "detalle": "Usuario eliminado: VR"
-    },
-    {
       "id": "6f089345-dec0-43be-baf2-456ce8adeeec",
       "fecha": "2026-04-26T18:29:43.273Z",
       "usuario": "admin",
@@ -467,8 +458,24 @@
       "modulo": "sol_volumetricas",
       "ref_id": "a7d2c970-ded9-4db1-91e1-79d057a9d0b4",
       "detalle": "Nuevo título: 0.1025, fecha 2026-04-27"
+    },
+    {
+      "id": "857a5726-ad9d-4e06-8b9f-9375456e05a0",
+      "fecha": "2026-05-25T01:28:23.128Z",
+      "usuario": "FM",
+      "tipo": "edicion",
+      "modulo": "usuarios",
+      "ref_id": "dc78d23b-7c4e-48cc-98e8-e70948f533b3",
+      "detalle": "Usuario eliminado: VR"
+    },
+    {
+      "id": "e8cc1a25-b2e9-4b67-aca0-7d2cf1f28392",
+      "fecha": "2026-05-25T02:00:18.322Z",
+      "usuario": "FM",
+      "tipo": "edicion",
+      "modulo": "usuarios",
+      "ref_id": "dc78d23b-7c4e-48cc-98e8-e70948f533b3",
+      "detalle": "Cambio de rol: VR (usuario -> gestor)"
     }
-  ],
-  "ts_mod": "2026-05-25T01:28:23.128Z",
-  "device_mod": "dev_mpkipilj_u3s1f"
+  ]
 }
