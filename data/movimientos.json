@@ -1,6 +1,24 @@
 {
   "log": [
     {
+      "id": "8e4b546f-0e26-48c1-b71e-d7ce5fef82a5",
+      "fecha": "2026-08-21T16:55:40.454Z",
+      "usuario": "VB",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "37c7fbf8",
+      "detalle": "Editado: Cafeína USP RS (estandar)"
+    },
+    {
+      "id": "2afb0aa9-365b-46bf-a658-466ca6ace8c9",
+      "fecha": "2026-08-21T16:55:39.647Z",
+      "usuario": "VB",
+      "tipo": "maestro",
+      "modulo": "maestro",
+      "ref_id": "37c7fbf8",
+      "detalle": "Editado: Cafeína USP RS (estandar)"
+    },
+    {
       "id": "9bfbdd9b-fbff-4e99-b374-ee879dc6370a",
       "fecha": "2026-08-21T16:55:09.317Z",
       "usuario": "VB",
@@ -496,6 +514,6 @@
       "detalle": "Cambio de rol: VR (usuario -> gestor)"
     }
   ],
-  "ts_mod": "2026-08-21T16:55:10.974Z",
+  "ts_mod": "2026-08-21T16:55:40.607Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
