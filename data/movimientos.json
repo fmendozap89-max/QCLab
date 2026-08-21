@@ -1,6 +1,15 @@
 {
   "log": [
     {
+      "id": "9bfbdd9b-fbff-4e99-b374-ee879dc6370a",
+      "fecha": "2026-08-21T16:55:09.317Z",
+      "usuario": "VB",
+      "tipo": "ingreso",
+      "modulo": "estandares",
+      "ref_id": "93a37344-da0b-4640-b75d-fbf5af5dcfe5",
+      "detalle": "Ingreso: Cafeína USP RS "
+    },
+    {
       "id": "5ee4e19d-d256-425e-b46f-3ab581526076",
       "fecha": "2026-08-21T16:55:07.944Z",
       "usuario": "VB",
@@ -487,6 +496,6 @@
       "detalle": "Cambio de rol: VR (usuario -> gestor)"
     }
   ],
-  "ts_mod": "2026-08-21T16:55:08.854Z",
+  "ts_mod": "2026-08-21T16:55:10.974Z",
   "device_mod": "dev_moh2dpz4_wtzui"
 }
