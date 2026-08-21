@@ -30,6 +30,22 @@
       "uds_en_uso": 0,
       "consumos": [],
       "vencimiento": "2027-03-05"
+    },
+    {
+      "id": "93a37344-da0b-4640-b75d-fbf5af5dcfe5",
+      "estado": "activo",
+      "maestro_id": "37c7fbf8",
+      "fecha_ingreso": "2026-08-21",
+      "ingresado_por": "VB",
+      "ts_mod": "2026-08-21T16:55:09.317Z",
+      "comentarios": [],
+      "categoria": "USP",
+      "lote": "aedfwer",
+      "cantidad_ingreso": 3,
+      "uds_cerradas": 3,
+      "uds_en_uso": 0,
+      "consumos": [],
+      "vencimiento": "2027-03-05"
     }
   ],
   "ts_mod": "2026-08-21T16:55:07.944Z",
